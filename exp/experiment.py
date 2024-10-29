@@ -580,16 +580,16 @@ def doTrial(cfg):
             cfg['home'].draw()
             # if showcursor:
             cfg['cursor'].draw()
+            # else:
+            #print('no-cursor, phase 1 or 3')
+            if (np.sqrt(sum([c**2 for c in cursorpos])) < (0.15 * cfg['NSU'])):
+                cfg['cursor'].draw()
             else:
-                #print('no-cursor, phase 1 or 3')
-                if (np.sqrt(sum([c**2 for c in cursorpos])) < (0.15 * cfg['NSU'])):
-                    cfg['cursor'].draw()
-                else:
-                    # put arrow in home position
-                    grain = (2*np.pi)/8
-                    arrowangle = (((cursorangle-(grain/2)) // grain) * grain) + grain
-                    cfg['home_arrow'].ori = ((-1 * arrowangle)/np.pi)*180
-                    cfg['home_arrow'].draw()
+                # put arrow in home position
+                grain = (2*np.pi)/8
+                arrowangle = (((cursorangle-(grain/2)) // grain) * grain) + grain
+                cfg['home_arrow'].ori = ((-1 * arrowangle)/np.pi)*180
+                cfg['home_arrow'].draw()
             #print([sp.sqrt(sp.sum(sp.array(cursorpos)**2)), (0.025 * cfg['NSU'])])
             if (np.sqrt(np.sum(np.array(cursorpos)**2)) < cfg['radius']):
                 if phase == 0:
