@@ -11,6 +11,7 @@
 
 
 from psychopy import event, visual
+from psychopy.tools.coordinatetools import pol2cart, cart2pol
 #from psychopy.hardware import keyboard
 from pyglet.window import key
 import random
@@ -311,7 +312,21 @@ def createTasks(cfg):
     # going back to original Bond & Taylor, 2015 targets:
     offset = 0.0
     # targets = [ta+offset for ta in list(range(0,360,45))]
-    targets = [ta+offset for ta in list(range(-15,210,30))]
+    # targets = [ta+offset for ta in list(range(-15,210,30))]
+
+    # NOPE!
+    # new set of targets:
+    ntargets = 8
+    # for open circular stencil:
+    gap = 20
+    start = (180 - ((ntargets-1) * gap)) / 2
+    targets = [(x * gap) + start for x in range(ntargets)]
+
+    # temp for cone stencil
+    gap = 2
+    start = (180 - ((ntargets-1) * gap)) / 2
+    targets = [(x * gap) + start for x in range(ntargets)]
+
     cfg['targets'] = targets
 
     # aiming arrow shouldn't be straight at the target (especially in the aligned session)
@@ -326,7 +341,7 @@ def createTasks(cfg):
     # with negative rotations, the strategy should always be positive
     # (or zero during baseline)
     # so having negative starting locations ensure we get serious responses only:
-    aimingoffsets = [-15,-10] * 4
+    aimingoffsets = [-10] * 8
 
     # groupno = cfg['groupno']
 
@@ -344,24 +359,22 @@ def createTasks(cfg):
 
     tasktrials = [32,16,16]
     taskrotation = [0,0,0]
-    taskaiming = [True,False,True]
+    taskaiming = [True,True,True]
     taskcursor = [True,False,True]
-    taskstrategy = ['NA','none','NA']
+    taskstrategy = ['NA','NA','NA']
     taskinstructions = ['aim and reach for target',
-                        'reach without cursor',
-                        'aim and reach for target']
+                        '',
+                        '']
 
 
 
-    # TASK THAT INSTRUCTS THE EXPERIMENTER?
-
-
-    tasktrials = tasktrials + [0]
-    taskrotation = taskrotation + [0]
-    taskaiming = taskaiming + [False]
-    taskcursor = taskcursor + [True]
-    taskstrategy = taskstrategy + ['NA']
-    taskinstructions = taskinstructions + ['EXPERIMENTER:\ngive instructions, part TWO (2)']
+    # # TASK THAT INSTRUCTS THE EXPERIMENTER?
+    # tasktrials = tasktrials + [0]
+    # taskrotation = taskrotation + [0]
+    # taskaiming = taskaiming + [False]
+    # taskcursor = taskcursor + [True]
+    # taskstrategy = taskstrategy + ['NA']
+    # taskinstructions = taskinstructions + ['EXPERIMENTER:\ngive instructions, part TWO (2)']
 
 
 
@@ -370,10 +383,11 @@ def createTasks(cfg):
     tasktrials = tasktrials + [120,24]
     taskrotation = taskrotation + [-1 * cfg['rotation'],-1 * cfg['rotation']]
     taskaiming = taskaiming + [True,False]
-    taskinstructions = taskinstructions + ['aim and reach for target',
-                                            stratinstr]
+    # taskinstructions = taskinstructions + ['aim and reach for target',
+    #                                         stratinstr]
+    taskinstructions = taskinstructions + ['','']
     taskcursor = taskcursor + [True,False]
-    taskstrategy = taskstrategy + ['NA',strategies]
+    taskstrategy = taskstrategy + ['NA','NA']
 
 
     for taskno in range(len(tasktrials)):
@@ -506,14 +520,21 @@ def doTrial(cfg):
     cursorY = []
     time_s = []
 
+    jitter = (random.choice([-0.5,-0.25,-0.1,0.1,0.25,0.5]) / 180) * np.pi
 
     while not(trialDone):
 
         [X,Y,T] = cfg['mouse'].getPos()
 
-        cursorpos = list(R.dot(np.array([[X],[Y]])).flatten())
-        cfg['cursor'].pos = cursorpos
-        cursorangle = np.arctan2(cursorpos[1],cursorpos[0])
+        if showcursor:
+            cursorpos = list(R.dot(np.array([[X],[Y]])).flatten())
+            cfg['cursor'].pos = cursorpos
+            cursorangle = np.arctan2(cursorpos[1],cursorpos[0])
+        else:
+            polpos = cart2pol(X,Y, units='rad')
+            polpos[0] += jitter
+            cfg['cursor'].pos = pol2cart(polpos[0], polpos[1], units='rad')
+            cursorangle = polpos[0]
 
         # # # # # # # # # # #  # # ## # # # # # #  # # # # 
         # # 
