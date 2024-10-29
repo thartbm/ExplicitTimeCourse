@@ -552,10 +552,10 @@ def doTrial(cfg):
 
         if (phase == 2):
             cfg['target'].draw()
-            if showcursor:
-                cfg['cursor'].draw()
-                if ( np.sqrt( np.sum( (np.array(cursorpos) - np.array(targetpos))**2 ) ) ) < cfg['radius']:
-                    phase = 3
+            # if showcursor:
+            cfg['cursor'].draw()
+            if ( np.sqrt( np.sum( (np.array(cursorpos) - np.array(targetpos))**2 ) ) ) < cfg['radius']:
+                phase = 3
             else:
                 #print('no-cursor, phase 2')
                 idx = np.argmin( abs( np.array(time_s)+0.250-time_s[-1] ) )
@@ -578,8 +578,8 @@ def doTrial(cfg):
 
         if (phase == 0) or (phase == 3):
             cfg['home'].draw()
-            if showcursor:
-                cfg['cursor'].draw()
+            # if showcursor:
+            cfg['cursor'].draw()
             else:
                 #print('no-cursor, phase 1 or 3')
                 if (np.sqrt(sum([c**2 for c in cursorpos])) < (0.15 * cfg['NSU'])):
