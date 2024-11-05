@@ -51,3 +51,4 @@ rsconnect/
 
 # custom ignores:
 *.png
+*.csv
