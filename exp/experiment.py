@@ -10,7 +10,7 @@
 # -  collecting demographics
 
 
-from psychopy import event, visual
+from psychopy import event, visual, monitors
 from psychopy.tools.coordinatetools import pol2cart, cart2pol
 #from psychopy.hardware import keyboard
 from pyglet.window import key
@@ -63,6 +63,7 @@ def runExp(ID=None, rotation=None):
 
         # if completed successfully, combine all data into one file:
         cfg = combineData(cfg)
+        cfg = makeSummaryFile(cfg)
 
     except Exception as err:
 
@@ -188,7 +189,17 @@ def createEnvironment(cfg):
     # instantiate a window object:
     # optimal settings for our mirror tablet-setup
     # the view scale ensures 8 cm on the tablet is equal to 8 cm on the screen
-    cfg['win'] = visual.Window(fullscr=True, units='pix', waitBlanking=False, viewScale=[0.72,-0.72], color=[-1,-1,-1], screen=1)
+
+    myMonitor = monitors.Monitor(name='temp',
+                                 distance=100,
+                                 width=43.3)
+    mymonitor.setSizePix([1680,1050])
+
+    cfg['win'] = visual.Window(fullscr=True, units='cm', waitBlanking=False, viewScale=[1,-1], color=[-1,-1,-1], screen=1, monitor=myMonitor)
+
+    #   "size_px"         : [1680, 1050], 
+    #   "size_cm"         : [43.3, 27.1],
+    #   "viewscale"       : [1,-1],
 
     # for testing on non-mirrored setup:
     #cfg['win'] = visual.Window(fullscr=True, units='pix', waitBlanking=True, viewScale=[1,1], color=[-1,-1,-1])
@@ -202,27 +213,26 @@ def createEnvironment(cfg):
     # the monitor on the tablet setup is 1680 pixels wide,
     # and that should span 31 cm on the tablet surface
 
-    PPC = max(winSize)/31.
+    cfg['xPPC'] = 1680/43.3
+    cfg['yPPC'] = 1050/27.1
 
-    cfg['NSU'] = PPC * 8
+    cfg['targetdistance'] = 8
 
-    cfg['targetdistance'] = cfg['NSU']
-
-    cfg['radius'] = PPC*0.25
+    cfg['radius'] = 0.25
 
     # set up visual objects for use in experiment:
-    cfg['home'] = visual.Circle(win=cfg['win'], pos=cfg['homepos'], radius=cfg['radius'], lineWidth=cfg['NSU']*0.005, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
+    cfg['home'] = visual.Circle(win=cfg['win'], pos=cfg['homepos'], radius=cfg['radius'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
 
-    cfg['cursor'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=cfg['NSU']*0.005, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor='#999999')
+    cfg['cursor'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor='#999999')
 
-    cfg['target'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=cfg['NSU']*0.005, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
+    cfg['target'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
 
     cfg['instruction'] = visual.TextStim(win=cfg['win'], text='', pos=[0,0], colorSpace='rgb', color='#999999', flipVert=True)
 
     #arrowvertices = ((-.33,-.33),(6.33,-.33),(6,-1),(8,0),(6,1),(6.33,.33),(-.33,.33))
     arrowvertices = ((-.02,-.02),(0.82,-.02),(0.8,-.08),(1,0),(0.8,.08),(0.82,.02),(-.02,.02))
 
-    cfg['aim_arrow'] = visual.ShapeStim(win=cfg['win'], lineWidth=cfg['NSU']*0.005, lineColorSpace='rgb', lineColor='#CC00CC', fillColorSpace='rgb', fillColor=None, vertices=arrowvertices, closeShape=True, size=PPC*7)
+    cfg['aim_arrow'] = visual.ShapeStim(win=cfg['win'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#CC00CC', fillColorSpace='rgb', fillColor=None, vertices=arrowvertices, closeShape=True, size=PPC*7)
 
     #arrowvertices = ((-.3,-.6),(.8,0),(-.3,.6),(0,0))
     #cfg['home_arrow'] = visual.ShapeStim(win=cfg['win'], lineWidth=cfg['NSU']*0.005, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None, vertices=arrowvertices, closeShape=True, size=cfg['radius'])
@@ -273,14 +283,30 @@ def createEnvironment(cfg):
     # set up 'mouse' object to track reaches:
     class myMouse:
 
+        # TABLET:
+        # "size_px"    : [1680, 1050],
+        # "size_cm"    : [31.1, 21.6],
+        # "mapping"    : 'relative',     <-   this is not true right now
+
+        # MONITOR:
+        #   "size_px"         : [1680, 1050], 
+        #   "size_cm"         : [43.3, 27.1],
+        #   "viewscale"       : [1,-1],
+
         def __init__(self,cfg):
             # we use a psychopy mouse object
             self.psyMouse = event.Mouse(visible = False, newPos = None, win = cfg['win'])
+            self.xfactor = 43.3/31.1
+            self.yfactor = 27.1/21.6
 
         def getPos(self):
             # but in addition to the position, we also return the time the position was asked for
             [X,Y] = self.psyMouse.getPos()
-            return [X,Y,time.time()]
+            st = time.time()
+            X = X * self.xfactor # scale to centimeters ?
+            Y = Y * self.yfactor # scale to centimeters ?
+
+            return [X,Y,st]
 
     cfg['mouse'] = myMouse(cfg)
 
@@ -324,6 +350,7 @@ def createTasks(cfg):
 
     # temp for cone stencil
     gap = 2
+    # this can stay...
     start = (180 - ((ntargets-1) * gap)) / 2
     targets = [(x * gap) + start for x in range(ntargets)]
 
@@ -336,11 +363,13 @@ def createTasks(cfg):
     # as then people will also just press enter right away
     # 2~3 degrees looks like 0 (on 800x600 pixels), and explicit should be between 15 - 30 degrees
     # so we'll sit in between and do 5 and 10 degree offsets at random:
-    aimingoffsets = [-5,5,-10,10,-5,5,-10,10]
+
+    # aimingoffsets = [-5,5,-10,10,-5,5,-10,10]
 
     # with negative rotations, the strategy should always be positive
     # (or zero during baseline)
     # so having negative starting locations ensure we get serious responses only:
+
     aimingoffsets = [-10] * 8
 
     # groupno = cfg['groupno']
@@ -380,14 +409,14 @@ def createTasks(cfg):
 
     # NOW FOR THE ROTATED PARTs:
 
-    tasktrials = tasktrials + [120,24]
-    taskrotation = taskrotation + [-1 * cfg['rotation'],-1 * cfg['rotation']]
-    taskaiming = taskaiming + [True,False]
+    tasktrials = tasktrials + [120,24,24]
+    taskrotation = taskrotation + [-1 * cfg['rotation'], 0, -1 * cfg['rotation']]
+    taskaiming = taskaiming + [True,True,True]
     # taskinstructions = taskinstructions + ['aim and reach for target',
     #                                         stratinstr]
-    taskinstructions = taskinstructions + ['','']
-    taskcursor = taskcursor + [True,False]
-    taskstrategy = taskstrategy + ['NA','NA']
+    taskinstructions = taskinstructions + ['','','important:\n\nSWITCH HAND']
+    taskcursor = taskcursor + [True,False,True]
+    taskstrategy = taskstrategy + ['NA','NA','NA']
 
 
     for taskno in range(len(tasktrials)):
@@ -644,22 +673,22 @@ def doTrial(cfg):
                  'trial_idx':trial_idx,
                  'cutrial_no':cutrial_no,
                  'targetangle_deg':targetangle_deg,
-                 'targetx':targetx,
-                 'targety':targety,
+                 'targetx_cm':targetx,
+                 'targety_cm':targety,
                  'rotation_deg':rotation_deg,
                  'doaiming_bool':doaiming_bool,
                  'aimstart_deg':aimstart_deg,
-                 'showcursor_bool':showcursor_bool,
+                 'zeroclamped_bool':not(showcursor_bool),
                  'usestrategy_cat':usestrategy_cat,
                  'aim_deg':aim_deg,
                  'aimdeviation_deg':aimdeviation_deg,
                  'aimtime_ms':aimtime_ms,
                  'cutime_ms':cutime_ms,
                  'time_ms':time_ms,
-                 'mousex':mouseX,
-                 'mousey':mouseY,
-                 'cursorx':cursorX,
-                 'cursory':cursorY}
+                 'mousex_cm':mouseX,
+                 'mousey_cm':mouseY,
+                 'cursorx_cm':cursorX,
+                 'cursory_cm':cursorY}
     # make dictionary into data frame:
     trialdata = pd.DataFrame(trialdata)
 
@@ -743,9 +772,24 @@ def combineData(cfg):
     combinedData = pd.concat(trialdataframes)
 
     # store combined data in one file:
-    filename = 'data/%s/p%03d/COMBINED_%s_p%03d.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
+    filename = 'data/%s/%s/COMBINED_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
     combinedData.to_csv( filename, index=False, float_format='%0.5f' )
 
     return(cfg)
 
-runExp()
+def makeSummaryFile(cfg):
+
+    # read the previously generated csv file (see above)
+    filename = 'data/%s/%s/COMBINED_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
+    combined = pd.read_csv(filename)
+
+    trialnos = df['cutrial_no'].unique()
+
+    for trialno in trialnos:
+        pass
+        # find the correct indices
+
+
+    return(cfg)
+
+# runExp()
