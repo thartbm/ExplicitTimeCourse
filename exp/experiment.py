@@ -232,7 +232,7 @@ def createEnvironment(cfg):
     #arrowvertices = ((-.33,-.33),(6.33,-.33),(6,-1),(8,0),(6,1),(6.33,.33),(-.33,.33))
     arrowvertices = ((-.02,-.02),(0.82,-.02),(0.8,-.08),(1,0),(0.8,.08),(0.82,.02),(-.02,.02))
 
-    cfg['aim_arrow'] = visual.ShapeStim(win=cfg['win'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#CC00CC', fillColorSpace='rgb', fillColor=None, vertices=arrowvertices, closeShape=True, size=PPC*7)
+    cfg['aim_arrow'] = visual.ShapeStim(win=cfg['win'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#CC00CC', fillColorSpace='rgb', fillColor=None, vertices=arrowvertices, closeShape=True, size=7)
 
     #arrowvertices = ((-.3,-.6),(.8,0),(-.3,.6),(0,0))
     #cfg['home_arrow'] = visual.ShapeStim(win=cfg['win'], lineWidth=cfg['NSU']*0.005, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None, vertices=arrowvertices, closeShape=True, size=cfg['radius'])
@@ -588,7 +588,7 @@ def doTrial(cfg):
             else:
                 #print('no-cursor, phase 2')
                 idx = np.argmin( abs( np.array(time_s)+0.250-time_s[-1] ) )
-                if ( np.sqrt(mouseX[-1]**2 + mouseY[-1]**2) ) > (cfg['NSU']*.5):
+                if ( np.sqrt(mouseX[-1]**2 + mouseY[-1]**2) ) > (cfg['targetdistance']*.5):
                     distance = np.sum( np.sqrt(np.diff(np.array([mouseX[idx:]]))**2 + np.diff(np.array([mouseY[idx:]]))**2) )
                     if distance < (0.01 * cfg['NSU']):
                         phase = 3
@@ -604,14 +604,15 @@ def doTrial(cfg):
                 phase = 0
 
 
-
+        # get to the home position
+        # either at the start of a trial (phase 0) or at the end of a trial (phase 3)
         if (phase == 0) or (phase == 3):
             cfg['home'].draw()
             # if showcursor:
-            cfg['cursor'].draw()
+            # cfg['cursor'].draw()
             # else:
             #print('no-cursor, phase 1 or 3')
-            if (np.sqrt(sum([c**2 for c in cursorpos])) < (0.15 * cfg['NSU'])):
+            if (np.sqrt(sum([c**2 for c in cursorpos])) < (0.15 * cfg['targetdistance'])):
                 cfg['cursor'].draw()
             else:
                 # put arrow in home position
@@ -669,26 +670,26 @@ def doTrial(cfg):
         aimtime_ms = [cfg['aimtime_ms']] * nsamples
 
     # put all lists in dictionary:
-    trialdata = {'task_idx':task_idx,
-                 'trial_idx':trial_idx,
-                 'cutrial_no':cutrial_no,
-                 'targetangle_deg':targetangle_deg,
-                 'targetx_cm':targetx,
-                 'targety_cm':targety,
-                 'rotation_deg':rotation_deg,
-                 'doaiming_bool':doaiming_bool,
-                 'aimstart_deg':aimstart_deg,
-                 'zeroclamped_bool':not(showcursor_bool),
-                 'usestrategy_cat':usestrategy_cat,
-                 'aim_deg':aim_deg,
-                 'aimdeviation_deg':aimdeviation_deg,
-                 'aimtime_ms':aimtime_ms,
-                 'cutime_ms':cutime_ms,
-                 'time_ms':time_ms,
-                 'mousex_cm':mouseX,
-                 'mousey_cm':mouseY,
-                 'cursorx_cm':cursorX,
-                 'cursory_cm':cursorY}
+    trialdata = { 'task_idx'         : task_idx,
+                  'trial_idx'        : trial_idx,
+                  'cutrial_no'       : cutrial_no,
+                  'targetangle_deg'  : targetangle_deg,
+                  'targetx_cm'       : targetx,
+                  'targety_cm'       : targety,
+                  'rotation_deg'     : rotation_deg,
+                  'doaiming_bool'    : doaiming_bool,
+                  'aimstart_deg'     : aimstart_deg,
+                  'zeroclamped_bool' : not(showcursor_bool),
+                  'usestrategy_cat'  : usestrategy_cat,
+                  'aim_deg'          : aim_deg,
+                  'aimdeviation_deg' : aimdeviation_deg,
+                  'aimtime_ms'       : aimtime_ms,
+                  'cutime_ms'        : cutime_ms,
+                  'time_ms'          : time_ms,
+                  'mousex_cm'        : mouseX,
+                  'mousey_cm'        : mouseY,
+                  'cursorx_cm'       : cursorX,
+                  'cursory_cm'       : cursorY }
     # make dictionary into data frame:
     trialdata = pd.DataFrame(trialdata)
 
