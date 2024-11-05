@@ -4,8 +4,8 @@
 import wx
 import wx.adv # advanced GUI widgets
 
-# we need our module:
-import PyVMEC2
+# we need our experiment:
+import experiment
 
 # we need to open webbrowsers to fill in the consent form:
 import webbrowser as wb
@@ -58,7 +58,7 @@ class MyFrame(wx.Frame):
         self.SetTitle("clamp speed tasks runner (order test)")
         # end wxGlade
 
-        newURL = 'https://yorkufoh.ca1.qualtrics.com/jfe/form/SV_cZ7siSsepnvqtOS?id=%s'%(self.text_participantID.GetLabel())
+        # newURL = 'https://yorkufoh.ca1.qualtrics.com/jfe/form/SV_cZ7siSsepnvqtOS?id=%s'%(self.text_participantID.GetLabel())
         self.hyperlink_qualtrics.SetURL(newURL)
         self.hyperlink_qualtrics.SetLabel('questionnaire')
 
@@ -105,26 +105,25 @@ class MyFrame(wx.Frame):
     def setIDandTask(self):
 
         # these are the conditions we are running:
-        conditions = [  'stl_clamp_1t',
-                        'stl_clamp_2t',
-                        'stl_clamp_random',
-                        'stl_rot_1t',
-                        'stl_rot_2t',
-                        'stl_rot_random']
+        conditions = [  'aiming20',
+                        'aiming30',
+                        'aiming40',
+                        'aiming50',
+                        'aiming60'  ]
 
         # we get the IDs for participants in each condition:
         participants = {}
         for condition in conditions:
-            participants[condition] = os.listdir('experiments/%s/data/'%(condition))
+            participants[condition] = os.listdir('data/%s/'%(condition))
 
         
         # in order to pick a _NEW_ participants ID, we need to know the...
         names_in_use = sum([participants[k] for k in participants.keys()], []) # flatten the list... bit hacky
 
-        new_name = 'clampspeed_'+secrets.token_hex(3)
+        new_name = ''+secrets.token_hex(3)
         
         while new_name in names_in_use:
-            new_name = 'clampspeed_'+secrets.token_hex(3)
+            new_name = ''+secrets.token_hex(3)
         
         self.text_participantID.SetLabel(new_name)
 
