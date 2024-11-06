@@ -542,43 +542,44 @@ def doTrial(cfg):
     trialDone = False
     phase = 0
 
+    beyond2 = False
+
     # create lists to store data in:
     mouseX = []
     mouseY = []
     cursorX = []
     cursorY = []
     time_s = []
+    phases = []
+    devsample = []
 
-    jitter = (random.choice([-0.5,-0.25,-0.1,0.1,0.25,0.5]) / 180) * np.pi
+    # jitter = (random.choice([-0.5,-0.25,-0.1,0.1,0.25,0.5]) / 180) * np.pi
+    jitter = 0
 
     while not(trialDone):
 
         [X,Y,T] = cfg['mouse'].getPos()
 
         if showcursor:
+            # regular trial, with participant controlled (sometime rotated) cursor:
             cursorpos = list(R.dot(np.array([[X],[Y]])).flatten())
             cfg['cursor'].pos = cursorpos
             cursorangle = np.arctan2(cursorpos[1],cursorpos[0])
         else:
+            # zero-clamped trial, where the cursor always goes to the target:
             polpos = cart2pol(X,Y, units='rad')
-            polpos[0] += jitter
-            cfg['cursor'].pos = pol2cart(polpos[0], polpos[1], units='rad')
+            cfg['cursor'].pos = pol2cart(polpos[0]+jitter, polpos[1], units='rad')
             cursorangle = polpos[0]
 
-        # # # # # # # # # # #  # # ## # # # # # #  # # # # 
-        # # 
-        # # HERE WE NEED TO ZERO-CLAMP THE FEEDBACK
-        # # 
-        # # (if appropriate...)
-        # # 
-        # # # # # # # # # # #  # # ## # # # # # #  # # # # 
 
         mouseX.append(X)
         mouseY.append(Y)
         cursorX.append(cursorpos[0])
         cursorY.append(cursorpos[1])
         time_s.append(T)
+        phases.append(phase)
 
+        # move to the target phase:
         if (phase == 2):
             cfg['target'].draw()
             # if showcursor:
@@ -590,9 +591,18 @@ def doTrial(cfg):
                 idx = np.argmin( abs( np.array(time_s)+0.250-time_s[-1] ) )
                 if ( np.sqrt(mouseX[-1]**2 + mouseY[-1]**2) ) > (cfg['targetdistance']*.5):
                     distance = np.sum( np.sqrt(np.diff(np.array([mouseX[idx:]]))**2 + np.diff(np.array([mouseY[idx:]]))**2) )
-                    if distance < (0.01 * cfg['NSU']):
+                    if distance < (0.01 * cfg['targetdistance']):
                         phase = 3
+            if beyond2:
+                devsample.append(0)
+            else:
+                if (np.sqrt(np.sum(np.array(cursorpos)**2)) > 2):
+                    beyond2 = True
+                    devsample.append(1)
+        else:
+            devsample.append(0)
 
+        # hold at home phase:
         if (phase == 1):
             #cfg['home'].draw()
             cfg['cursor'].draw()
@@ -679,24 +689,27 @@ def doTrial(cfg):
                   'rotation_deg'     : rotation_deg,
                   'doaiming_bool'    : doaiming_bool,
                   'aimstart_deg'     : aimstart_deg,
-                  'zeroclamped_bool' : not(showcursor_bool),
-                  'usestrategy_cat'  : usestrategy_cat,
                   'aim_deg'          : aim_deg,
                   'aimdeviation_deg' : aimdeviation_deg,
                   'aimtime_ms'       : aimtime_ms,
+                  'zeroclamped_bool' : not(showcursor_bool),
+                #   'usestrategy_cat'  : usestrategy_cat, # this is not useful in this paradigm
+                  'phase'            : phases,       # this used to not be present, but should make data easier to analyze
                   'cutime_ms'        : cutime_ms,
                   'time_ms'          : time_ms,
                   'mousex_cm'        : mouseX,
                   'mousey_cm'        : mouseY,
                   'cursorx_cm'       : cursorX,
-                  'cursory_cm'       : cursorY }
+                  'cursory_cm'       : cursorY,
+                  'deviation_bool'   : devsample     # if this is 1 (not 0), it;s the first sample beyond 2 cm
+                  }
+
     # make dictionary into data frame:
     trialdata = pd.DataFrame(trialdata)
 
     # store data frame:
     filename = 'data/%s/%s/task%02d-trial%04d.csv'%(cfg['groupname'],cfg['ID'],cfg['taskno']+1,cfg['trialno']+1)
     trialdata.to_csv( filename, index=False, float_format='%0.5f' )
-
 
     return(cfg)
 
@@ -749,7 +762,6 @@ def doAiming(cfg):
     #print(cfg['tasks'][cfg['taskno']]['target'][cfg['trialno']])
     #print(cfg['aim'])
 
-
     return(cfg)
 
 def combineData(cfg):
@@ -776,20 +788,52 @@ def combineData(cfg):
     filename = 'data/%s/%s/COMBINED_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
     combinedData.to_csv( filename, index=False, float_format='%0.5f' )
 
+    summaryData = combineData.loc[(combinedData['deviation_bool']==1),]
+    summaryData.loc[:, "reachdeviation_deg"] = [np.NaN] * summaryData.shape[0]
+
+    targetangles = summaryData['targetangle_deg'].unique()
+
+    allX = summaryData['mousex_cm']
+    allY = summaryData['mousey_cm']
+
+    for (targetangle in targetangles):
+
+        # relevant lines of the data frame:
+        idx = summaryData['targetangle_deg'] == targetangle
+
+        # coordinates for those trials:
+        X, Y = list(allX[idx]), list(allY[idx])
+
+        # rotation matrix:
+        theta = -1 * (targetangle/180.)*np.pi
+        R = np.array([[np.cos(theta),-1*np.sin(theta)],[np.sin(theta),np.cos(theta)]],order='C')
+
+        # positions relative to target::
+        relmousepos = R.dot(np.array([X,Y]))
+        
+        # angle for those positions, relative to target:
+        relmouseangle_degs = (np.arctan2(relmousepos[0],relmousepos[1]) / np.pi) * 180
+
+        summaryData.loc[idx,'reachdeviation_deg'] = relmouseangle_degs
+
+    
+    filename = 'data/%s/%s/SUMMARY_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
+    summaryData.to_csv( filename, index=False, float_format='%0.5f' )
+
     return(cfg)
+
 
 def makeSummaryFile(cfg):
 
-    # read the previously generated csv file (see above)
-    filename = 'data/%s/%s/COMBINED_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
-    combined = pd.read_csv(filename)
+    # # read the previously generated csv file (see above)
+    # filename = 'data/%s/%s/COMBINED_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
+    # combined = pd.read_csv(filename)
 
-    trialnos = df['cutrial_no'].unique()
+    # trialnos = df['cutrial_no'].unique()
 
-    for trialno in trialnos:
-        pass
-        # find the correct indices
-
+    # for trialno in trialnos:
+    #     pass
+    #     # find the correct indices
 
     return(cfg)
 
