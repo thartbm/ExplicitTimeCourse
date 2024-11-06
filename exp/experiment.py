@@ -787,7 +787,7 @@ def combineData(cfg):
             # load trial data and store in list:
             filename = 'data/%s/%s/task%02d-trial%04d.csv'%(cfg['groupname'],cfg['ID'],taskno+1,trialno+1)
             trialdataframes.append(pd.read_csv(filename))
-%d
+
     # concatenate all data frames:
     combinedData = pd.concat(trialdataframes)
 
