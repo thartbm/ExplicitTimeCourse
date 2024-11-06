@@ -465,8 +465,8 @@ def doTasks(cfg):
 
             cfg['trialno'] = trialno
 
-            print(cfg['totrialno']+1)
-            # print('trials done: %d (task: %d / trial: %d)'%(cfg['totrialno']+1,taskno+1,trialno+1))
+            # print(cfg['totrialno']+1)
+            print('trials done: %d (task: %d / trial: %d)'%(cfg['totrialno']+1,taskno+1,trialno+1))
 
             cfg = doTrial(cfg)
 
@@ -795,7 +795,7 @@ def combineData(cfg):
     filename = 'data/%s/%s/COMBINED_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
     combinedData.to_csv( filename, index=False, float_format='%0.5f' )
 
-    summaryData = combineData.loc[(combinedData['deviation_bool']==1),]
+    summaryData = combinedData.loc[(combinedData['deviation_bool']==1),]
     summaryData.loc[:, "reachdeviation_deg"] = [np.NaN] * summaryData.shape[0]
 
     targetangles = summaryData['targetangle_deg'].unique()
