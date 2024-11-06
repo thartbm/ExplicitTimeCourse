@@ -303,8 +303,8 @@ def createEnvironment(cfg):
             # but in addition to the position, we also return the time the position was asked for
             [X,Y] = self.psyMouse.getPos()
             st = time.time()
-            X = X * self.xfactor # scale to centimeters ?
-            Y = Y * self.yfactor # scale to centimeters ?
+            X = X / self.xfactor # scale to centimeters ?
+            Y = Y / self.yfactor # scale to centimeters ?
 
             return [X,Y,st]
 
