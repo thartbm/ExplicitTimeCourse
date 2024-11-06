@@ -63,7 +63,6 @@ def runExp(ID=None, rotation=None):
 
         # if completed successfully, combine all data into one file:
         cfg = combineData(cfg)
-        cfg = makeSummaryFile(cfg)
 
     except Exception as err:
 
@@ -376,7 +375,7 @@ def createTasks(cfg):
 
 
     # First "task" is to get instructions from experimenter:
-    taskdict = {'target':[],'rotation':[],'aiming':[], 'aimoffset':[], 'cursor':[],'instruction':'EXPERIMENTER:\ngive instructions, part ONE (1)','strategy':[]}
+    taskdict = {'target':[],'rotation':[],'aiming':[], 'aimoffset':[], 'cursor':[],'instruction':'EXPERIMENTER:\ngive instructions','strategy':[]}
     tasks.append(taskdict)
 
     # participant number determines the order of include / exclude tasks:
@@ -387,11 +386,12 @@ def createTasks(cfg):
     #     stratinstr = stratinstr[::-1]
 
     tasktrials = [32,16,16]
+    tasktrials = [4,4,4]
     taskrotation = [0,0,0]
     taskaiming = [True,True,True]
     taskcursor = [True,False,True]
     taskstrategy = ['NA','NA','NA']
-    taskinstructions = ['aim and reach for target',
+    taskinstructions = ['aim\n&\nreach for target',
                         '',
                         '']
 
@@ -409,7 +409,8 @@ def createTasks(cfg):
 
     # NOW FOR THE ROTATED PARTs:
 
-    tasktrials = tasktrials + [120,24,24]
+    # tasktrials = tasktrials + [120,24,24]
+    tasktrials = tasktrials + [4,4,4]
     taskrotation = taskrotation + [-1 * cfg['rotation'], 0, -1 * cfg['rotation']]
     taskaiming = taskaiming + [True,True,True]
     # taskinstructions = taskinstructions + ['aim and reach for target',
@@ -825,18 +826,5 @@ def combineData(cfg):
     return(cfg)
 
 
-def makeSummaryFile(cfg):
-
-    # # read the previously generated csv file (see above)
-    # filename = 'data/%s/%s/COMBINED_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
-    # combined = pd.read_csv(filename)
-
-    # trialnos = df['cutrial_no'].unique()
-
-    # for trialno in trialnos:
-    #     pass
-    #     # find the correct indices
-
-    return(cfg)
 
 # runExp()
