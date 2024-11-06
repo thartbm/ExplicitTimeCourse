@@ -193,7 +193,7 @@ def createEnvironment(cfg):
     myMonitor = monitors.Monitor(name='temp',
                                  distance=100,
                                  width=43.3)
-    mymonitor.setSizePix([1680,1050])
+    myMonitor.setSizePix([1680,1050])
 
     cfg['win'] = visual.Window(fullscr=True, units='cm', waitBlanking=False, viewScale=[1,-1], color=[-1,-1,-1], screen=1, monitor=myMonitor)
 
