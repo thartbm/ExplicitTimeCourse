@@ -796,7 +796,7 @@ def combineData(cfg):
     allX = summaryData['mousex_cm']
     allY = summaryData['mousey_cm']
 
-    for (targetangle in targetangles):
+    for targetangle in targetangles:
 
         # relevant lines of the data frame:
         idx = summaryData['targetangle_deg'] == targetangle
