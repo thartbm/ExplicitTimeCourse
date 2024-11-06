@@ -465,6 +465,8 @@ def doTasks(cfg):
 
             cfg['trialno'] = trialno
 
+            print('trials done: %d (task: %d / trial: %d)'%(totrialno+1,taskno+1,trialno+1))
+
             cfg = doTrial(cfg)
 
             cfg['totrialno'] += 1
@@ -563,15 +565,16 @@ def doTrial(cfg):
 
         if showcursor:
             # regular trial, with participant controlled (sometime rotated) cursor:
+            # cfg['cursor'].pos = cursorpos
             cursorpos = list(R.dot(np.array([[X],[Y]])).flatten())
-            cfg['cursor'].pos = cursorpos
             cursorangle = np.arctan2(cursorpos[1],cursorpos[0])
         else:
             # zero-clamped trial, where the cursor always goes to the target:
             polpos = cart2pol(X,Y, units='rad')
-            cfg['cursor'].pos = pol2cart(polpos[0]+jitter, polpos[1], units='rad')
+            cursorpos = pol2cart(targetangle+jitter, polpos[1], units='rad')
             cursorangle = polpos[0]
 
+        cfg['cursor'].pos = cursorpos
 
         mouseX.append(X)
         mouseY.append(Y)
