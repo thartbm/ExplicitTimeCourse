@@ -88,7 +88,7 @@ class MyFrame(wx.Frame):
         print('\n\n' + self.task + '\n\n')
 
         # PyVMEC2.runExperiment(experiment=self.task, participant='%s'%(self.text_participantID.GetLabel()))
-        runExp(ID='%s'%(self.text_participantID.GetLabel()), rotation=int(self.task[6:]))
+        experiment.runExp(ID='%s'%(self.text_participantID.GetLabel()), rotation=int(self.task[6:]))
 
 
 
