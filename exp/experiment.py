@@ -599,6 +599,8 @@ def doTrial(cfg):
                 if (np.sqrt(np.sum(np.array(cursorpos)**2)) > 2):
                     beyond2 = True
                     devsample.append(1)
+                else:
+                    devsample.append(0)
         else:
             devsample.append(0)
 
