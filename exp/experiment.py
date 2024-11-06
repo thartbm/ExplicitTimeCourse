@@ -792,7 +792,7 @@ def combineData(cfg):
     combinedData = pd.concat(trialdataframes)
 
     # store combined data in one file:
-    filename = 'data/%s/%s/COMBINED_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
+    filename = 'data/%s/%s/COMBINED_%s_%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
     combinedData.to_csv( filename, index=False, float_format='%0.5f' )
 
     summaryData = combinedData.loc[(combinedData['deviation_bool']==1),]
@@ -824,7 +824,7 @@ def combineData(cfg):
         summaryData.loc[idx,'reachdeviation_deg'] = relmouseangle_degs
 
     
-    filename = 'data/%s/%s/SUMMARY_%s_p%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
+    filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(cfg['groupname'],cfg['ID'],cfg['groupname'],cfg['ID'])
     summaryData.to_csv( filename, index=False, float_format='%0.5f' )
 
     return(cfg)
