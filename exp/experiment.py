@@ -465,7 +465,7 @@ def doTasks(cfg):
 
             cfg['trialno'] = trialno
 
-            print('trials done: %d (task: %d / trial: %d)'%(totrialno+1,taskno+1,trialno+1))
+            print('trials done: %d (task: %d / trial: %d)'%(cfg['totrialno']+1,taskno+1,trialno+1))
 
             cfg = doTrial(cfg)
 
