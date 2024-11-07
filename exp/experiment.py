@@ -819,7 +819,7 @@ def combineData(cfg):
         relmousepos = R.dot(np.array([X,Y]))
         
         # angle for those positions, relative to target:
-        relmouseangle_degs = (np.arctan2(relmousepos[0],relmousepos[1]) / np.pi) * 180
+        relmouseangle_degs = (np.arctan2(relmousepos[1],relmousepos[0]) / np.pi) * 180
 
         summaryData.loc[idx,'reachdeviation_deg'] = relmouseangle_degs
 
