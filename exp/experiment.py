@@ -815,10 +815,10 @@ def combineData(cfg):
         theta = -1 * (targetangle/180.)*np.pi
         R = np.array([[np.cos(theta),-1*np.sin(theta)],[np.sin(theta),np.cos(theta)]],order='C')
 
-        # positions relative to target::
+        # positions relative to target (now at (8,0)):
         relmousepos = R.dot(np.array([X,Y]))
         
-        # angle for those positions, relative to target:
+        # angle for those positions, relative to target (at 0 degrees):
         relmouseangle_degs = (np.arctan2(relmousepos[1],relmousepos[0]) / np.pi) * 180
 
         summaryData.loc[idx,'reachdeviation_deg'] = relmouseangle_degs
