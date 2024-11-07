@@ -220,11 +220,14 @@ def createEnvironment(cfg):
     cfg['radius'] = 0.25
 
     # set up visual objects for use in experiment:
-    cfg['home'] = visual.Circle(win=cfg['win'], pos=cfg['homepos'], radius=cfg['radius'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
+    cfg['home'] = visual.Circle(win=cfg['win'], pos=cfg['homepos'], radius=cfg['radius'], lineWidth=2, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
 
-    cfg['cursor'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor='#999999')
+    cfg['cursor'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=2, lineColorSpace='rgb', lineColor='#990000', fillColorSpace='rgb', fillColor='#999999')
 
-    cfg['target'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=1.5, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
+    cfg['target'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=2, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
+
+    cfg['circle'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=2, lineColorSpace='rgb', lineColor='#000099', fillColorSpace='rgb', fillColor=None)
+
 
     cfg['instruction'] = visual.TextStim(win=cfg['win'], text='', pos=[0,0], colorSpace='rgb', color='#999999', flipVert=True)
 
@@ -632,11 +635,18 @@ def doTrial(cfg):
             if (np.sqrt(sum([c**2 for c in cursorpos])) < (0.15 * cfg['targetdistance'])):
                 cfg['cursor'].draw()
             else:
-                # put arrow in home position
-                grain = (2*np.pi)/8
-                arrowangle = (((cursorangle-(grain/2)) // grain) * grain) + grain
-                cfg['home_arrow'].ori = ((-1 * arrowangle)/np.pi)*180
-                cfg['home_arrow'].draw()
+
+                # # put arrow in home position
+                # grain = (2*np.pi)/8
+                # arrowangle = (((cursorangle-(grain/2)) // grain) * grain) + grain
+                # cfg['home_arrow'].ori = ((-1 * arrowangle)/np.pi)*180
+                # cfg['home_arrow'].draw()
+
+                # use circle feedback instead:
+                cfg['circle'].radius = np.sqrt(sum([c**2 for c in cursorpos]))
+                cfg['circle'].draw()
+
+
             #print([sp.sqrt(sp.sum(sp.array(cursorpos)**2)), (0.025 * cfg['NSU'])])
             if (np.sqrt(np.sum(np.array(cursorpos)**2)) < cfg['radius']):
                 if phase == 0:
