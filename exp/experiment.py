@@ -796,7 +796,8 @@ def combineData(cfg):
     combinedData.to_csv( filename, index=False, float_format='%0.5f' )
 
     summaryData = combinedData.loc[(combinedData['deviation_bool']==1),]
-    summaryData.loc[:, "reachdeviation_deg"] = [np.NaN] * summaryData.shape[0]
+    # summaryData.loc[:, "reachdeviation_deg"] = [np.NaN] * summaryData.shape[0]
+    summaryData.assign(reachdeviation_deg = np.NaN)
 
     targetangles = summaryData['targetangle_deg'].unique()
 
