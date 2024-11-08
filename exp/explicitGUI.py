@@ -128,7 +128,7 @@ class MyFrame(wx.Frame):
             existing += pdirs # this is to decide on a new participant ID
 
             # provisional:
-            learners[condition] = pdirs
+            # learners[condition] = pdirs
 
             # to decide on a condition, we need to have only the learners:
             # we got a list of participants, but we only care about the "learners"
@@ -137,10 +137,21 @@ class MyFrame(wx.Frame):
             for folder in pdirs:
                 filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
                 print(filename)
-            #     summary = pd.read_csv(filename)
+                summary = pd.read_csv(filename)
 
                 # take the last 16 trials of the rotated phase:
-                # rotated = summary[summary['taskno']]
+                rotated = summary.loc[(summary['task_idx']==5),]
+                rotend  = rotated.loc[(rotated['trial_idx']>4),]
+                meandev = rotend['reachdeviation_deg'].median()
+                rotation = list(rotend['rotation_deg'])[0]
+                meandev = -1 * np.sign(rotation) * meandev
+                if meandev > (np.abs(rotation)/2):
+                    print('%s is a learner'%(folder))
+                    condition_learners += [folder]
+                else:
+                    print('%s is NOT a learner'%(folder))
+
+            learners[condition] = condition_learners
 
             # participants[condition] = participantfolders
 
