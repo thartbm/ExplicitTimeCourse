@@ -30,7 +30,7 @@ def runExp(ID=None):
 
     cfg = {}
     cfg['ID'] = ID
-    cfg['rotation'] = rotation
+    cfg['rotation'] = 0
 
     random.seed(ID+'familiarization')
 
