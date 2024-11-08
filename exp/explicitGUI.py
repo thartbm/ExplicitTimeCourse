@@ -116,7 +116,8 @@ class MyFrame(wx.Frame):
                         'aiming60'  ]
 
         # we get the IDs for participants in each condition:
-        existing = {}
+        existing = []
+        conditioncount = {}
         for condition in conditions:
             # pdirs = os.listdir('data/%s/'%(condition))
 
@@ -124,27 +125,29 @@ class MyFrame(wx.Frame):
             pdirs = next(os.walk(os.path.join(cdir,'.')))[1]
 
             print(pdirs)
-            existing[condition] = pdirs # this is to decide on a new participant ID
+            existing += pdirs # this is to decide on a new participant ID
 
             # to decide on a condition, we need to have only the learners:
             # we got a list of participants, but we only care about the "learners"
             # lets find the learners, using their SUMMARY files
-            for folder in pdirs:
-                filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
-                print(filename)
-                summary = pd.read_csv(filename)
+            
+            # for folder in pdirs:
+            #     filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
+            #     print(filename)
+            #     summary = pd.read_csv(filename)
+
                 # take the last 16 trials of the rotated phase:
                 # rotated = summary[summary['taskno']]
 
-            participants[condition] = participantfolders
+            # participants[condition] = participantfolders
 
         
         # in order to pick a _NEW_ participants ID, we need to know the...
-        names_in_use = sum([participants[k] for k in participants.keys()], []) # flatten the list... bit hacky
+        # names_in_use = sum([existing[k] for k in existing.keys()], []) # flatten the list... bit hacky
 
         new_name = ''+secrets.token_hex(3)
         
-        while new_name in names_in_use:
+        while new_name in existing:
             new_name = ''+secrets.token_hex(3)
         
         self.text_participantID.SetLabel(new_name)
