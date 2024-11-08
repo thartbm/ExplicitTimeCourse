@@ -18,6 +18,7 @@ import secrets
 
 # to check and pick which condition to do:
 import numpy as np   # make array of condition name list
+import pandas as pd  # check SUMMARY file for learners / non-learners
 import random        # pick one at random in case of ties
 
 
@@ -117,7 +118,12 @@ class MyFrame(wx.Frame):
         # we get the IDs for participants in each condition:
         participants = {}
         for condition in conditions:
-            participants[condition] = os.listdir('data/%s/'%(condition))
+            participantfolders = os.listdir('data/%s/'%(condition))
+            # we got a list of participants, but we only care about the "learners"
+            # lets find the learners, using their SUMMARY files
+            for folder in participantfolders:
+
+            participants[condition] = participantfolders
 
         
         # in order to pick a _NEW_ participants ID, we need to know the...
