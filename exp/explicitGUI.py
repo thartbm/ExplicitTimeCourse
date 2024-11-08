@@ -17,7 +17,7 @@ import os
 import secrets
 
 # to check and pick which condition to do:
-import numpy as np   # make array of condition name list
+import numpy as np   # make arrays, and get math / trig functions
 import pandas as pd  # check SUMMARY file for learners / non-learners
 import random        # pick one at random in case of ties
 
@@ -122,7 +122,10 @@ class MyFrame(wx.Frame):
             # we got a list of participants, but we only care about the "learners"
             # lets find the learners, using their SUMMARY files
             for folder in participantfolders:
-
+                summary = pd.read_csv('data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder))
+                # take the last 16 trials of the rotated phase:
+                # rotated = summary[summary['taskno']]
+                
             participants[condition] = participantfolders
 
         
