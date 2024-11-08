@@ -255,6 +255,7 @@ def createEnvironment(cfg):
     cfg['circle'] = visual.Circle(  win=cfg['win'], 
                                     pos=cfg['homepos'], 
                                     radius=cfg['radius'], 
+                                    edges=180,
                                     lineWidth=3, 
                                     lineColorSpace='rgb', 
                                     lineColor='#000099', 
@@ -789,10 +790,10 @@ def doAiming(cfg):
             stopaiming = time.time()
 
         if cfg['keyboard'][key.NUM_LEFT]:
-            cfg['aim_arrow'].ori = cfg['aim_arrow'].ori - 0.5
+            cfg['aim_arrow'].ori = cfg['aim_arrow'].ori - 0.25
             #print(cfg['aim_arrow'].ori)
         if cfg['keyboard'][key.NUM_RIGHT]:
-            cfg['aim_arrow'].ori = cfg['aim_arrow'].ori + 0.5
+            cfg['aim_arrow'].ori = cfg['aim_arrow'].ori + 0.25
             #print(cfg['aim_arrow'].ori)
         #print(cfg['keyboard'])
         cfg['aim_arrow'].ori = cfg['aim_arrow'].ori % 360
