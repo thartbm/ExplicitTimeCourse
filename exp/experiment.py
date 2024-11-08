@@ -194,7 +194,14 @@ def createEnvironment(cfg):
                                  width=43.3)
     myMonitor.setSizePix([1680,1050])
 
-    cfg['win'] = visual.Window(fullscr=True, units='cm', waitBlanking=False, viewScale=[1,-1], color=[-1,-1,-1], screen=1, monitor=myMonitor)
+    cfg['win'] = visual.Window( size=[1680,1050], 
+                                fullscr=True, 
+                                units='cm', 
+                                waitBlanking=False, 
+                                viewScale=[1,-1], 
+                                color=[-1,-1,-1], 
+                                screen=1, 
+                                monitor=myMonitor)
 
     #   "size_px"         : [1680, 1050], 
     #   "size_cm"         : [43.3, 27.1],
@@ -220,13 +227,39 @@ def createEnvironment(cfg):
     cfg['radius'] = 0.25
 
     # set up visual objects for use in experiment:
-    cfg['home'] = visual.Circle(win=cfg['win'], pos=cfg['homepos'], radius=cfg['radius'], lineWidth=2, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
+    cfg['home'] = visual.Circle(    win=cfg['win'], 
+                                    pos=cfg['homepos'], 
+                                    radius=cfg['radius'], 
+                                    lineWidth=3, 
+                                    lineColorSpace='rgb', 
+                                    lineColor='#999999', 
+                                    fillColorSpace='rgb', 
+                                    fillColor=None         )
 
-    cfg['cursor'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=2, lineColorSpace='rgb', lineColor='#990000', fillColorSpace='rgb', fillColor='#999999')
+    cfg['cursor'] = visual.Circle(  win=cfg['win'], 
+                                    radius=cfg['radius'], 
+                                    lineWidth=0, 
+                                    lineColorSpace='rgb', 
+                                    lineColor=None, 
+                                    fillColorSpace='rgb', 
+                                    fillColor='#990000'     )
 
-    cfg['target'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=2, lineColorSpace='rgb', lineColor='#999999', fillColorSpace='rgb', fillColor=None)
+    cfg['target'] = visual.Circle(  win=cfg['win'], 
+                                    radius=cfg['radius'], 
+                                    lineWidth=3, 
+                                    lineColorSpace='rgb', 
+                                    lineColor='#009900', 
+                                    fillColorSpace='rgb', 
+                                    fillColor=None          )
 
-    cfg['circle'] = visual.Circle(win=cfg['win'], radius=cfg['radius'], lineWidth=2, lineColorSpace='rgb', lineColor='#000099', fillColorSpace='rgb', fillColor=None)
+    cfg['circle'] = visual.Circle(  win=cfg['win'], 
+                                    pos=cfg['homepos'], 
+                                    radius=cfg['radius'], 
+                                    lineWidth=3, 
+                                    lineColorSpace='rgb', 
+                                    lineColor='#000099', 
+                                    fillColorSpace='rgb', 
+                                    fillColor=None          )
 
 
     cfg['instruction'] = visual.TextStim(win=cfg['win'], text='', pos=[0,0], colorSpace='rgb', color='#999999', flipVert=True)
