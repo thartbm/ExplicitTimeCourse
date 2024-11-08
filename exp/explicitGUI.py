@@ -6,6 +6,7 @@ import wx.adv # advanced GUI widgets
 
 # we need our experiment:
 import experiment
+import familiarization
 
 # we need to open webbrowsers to fill in the consent form:
 import webbrowser as wb
@@ -32,12 +33,18 @@ class MyFrame(wx.Frame):
                           'visited':False}
 
         self.SetSize((400, 250))
+
+        self.count_counts = wx.StaticText(self, wx.ID_ANY, "")
+
         self.text_participantID = wx.StaticText(self, wx.ID_ANY, "")
 
         self.hyperlink_qualtrics = wx.adv.HyperlinkCtrl(self, wx.ID_ANY, " ", " ", size=[400,20])
+        
+        self.button_runfam = wx.Button(self, wx.ID_ANY, "familiarization")
         self.button_runit = wx.Button(self, wx.ID_ANY, "run experiment")
 
         # we'll set the run button to be disabled for now:
+        self.button_runfam.Disable()
         self.button_runit.Disable()
 
         # self.setParticipantID()
@@ -49,6 +56,7 @@ class MyFrame(wx.Frame):
         # and when certain things are clicked we run some functions...
 
         # when the run button is clicked, we need to run the experiment:
+        self.Bind(wx.EVT_BUTTON, self.onRunFamiliarization, self.button_runfam)
         self.Bind(wx.EVT_BUTTON, self.onRunExperiment, self.button_runit)
 
         # when people click the link to the consent form, we need to register this:
@@ -67,7 +75,12 @@ class MyFrame(wx.Frame):
 
     def __do_layout(self):
         # begin wxGlade: MyFrame.__do_layout
-        grid_sizer_1 = wx.GridSizer(3, 2, 0, 0)
+        grid_sizer_1 = wx.GridSizer(5, 2, 0, 0)
+
+        count_label = wx.StaticText(self, wx.ID_ANY, "counts:")
+        grid_sizer_1.Add(count_label, 0, wx.ALIGN_CENTER, 0)
+        grid_sizer_1.Add(self.count_counts, 0, wx.ALIGN_CENTER, 0)
+
         label_1 = wx.StaticText(self, wx.ID_ANY, "participant ID (code):")
         grid_sizer_1.Add(label_1, 0, wx.ALIGN_CENTER, 0)
         grid_sizer_1.Add(self.text_participantID, 0, wx.ALIGN_CENTER, 0)
@@ -75,6 +88,11 @@ class MyFrame(wx.Frame):
         label_2 = wx.StaticText(self, wx.ID_ANY, "pre questionnaire:")
         grid_sizer_1.Add(label_2, 0, wx.ALIGN_CENTER, 0)
         grid_sizer_1.Add(self.hyperlink_qualtrics, 0, wx.ALIGN_CENTER, 0)
+
+        label_4 = wx.StaticText(self, wx.ID_ANY, "familiarization:")
+        grid_sizer_1.Add(label_4, 0, wx.ALIGN_CENTER, 0)
+        grid_sizer_1.Add(self.button_runfam, 0, wx.ALIGN_CENTER, 0)
+
 
         label_3 = wx.StaticText(self, wx.ID_ANY, "run experiment:")
         grid_sizer_1.Add(label_3, 0, wx.ALIGN_CENTER, 0)
@@ -84,9 +102,17 @@ class MyFrame(wx.Frame):
         self.Layout()
         # end wxGlade
 
+    def onRunFamiliarization(self, e):
+        self.button_runit.Enable()
+        print('[familiarization]')
+
+        # PyVMEC2.runExperiment(experiment=self.task, participant='%s'%(self.text_participantID.GetLabel()))
+        familiarization.runExp(ID='%s'%(self.text_participantID.GetLabel()))
+
+
     def onRunExperiment(self, e):
         self.button_runit.Disable()
-        print('\n\n' + self.task + '\n\n')
+        print('\n' + self.task + '\n')
 
         # PyVMEC2.runExperiment(experiment=self.task, participant='%s'%(self.text_participantID.GetLabel()))
         experiment.runExp(ID='%s'%(self.text_participantID.GetLabel()), rotation=int(self.task[6:]))
@@ -102,7 +128,7 @@ class MyFrame(wx.Frame):
                  new = 1,
                  autoraise = True )
         
-        self.button_runit.Enable()
+        self.button_runfam.Enable()
         # self.testEnableRunButton()
 
 
@@ -173,6 +199,9 @@ class MyFrame(wx.Frame):
         # condition_Ns = [len(participants[k]) for k in participants.keys()]
 
         condition_Ns = [len(learners[k]) for k in learners.keys()]
+
+        learners_counts = ' / '.join(str(l) for l in condition_Ns)
+        self.count_counts.SetLabel(learners_counts)
 
         # - get the lowest number of participants in any condition
         lowN = np.min(condition_Ns)
