@@ -56,7 +56,7 @@ class MyFrame(wx.Frame):
 
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
-        self.SetTitle("clamp speed tasks runner (order test)")
+        self.SetTitle("explicit timecourse runner")
         # end wxGlade
 
         # newURL = 'https://yorkufoh.ca1.qualtrics.com/jfe/form/SV_cZ7siSsepnvqtOS?id=%s'%(self.text_participantID.GetLabel())
