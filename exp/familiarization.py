@@ -36,7 +36,7 @@ def runExp(ID=None):
 
     # this is the group from the original we'll be mimicking... without the PDP part
     # but this should be removed at some point!
-    cfg['groupname'] = 'aiming' + str(rotation)
+    cfg['groupname'] = 'aiming00'
 
     cfg['expstart'] = time.time()
 
