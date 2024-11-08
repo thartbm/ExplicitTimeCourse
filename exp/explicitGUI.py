@@ -117,7 +117,7 @@ class MyFrame(wx.Frame):
 
         # we get the IDs for participants in each condition:
         existing = []
-        conditioncount = {}
+        learners = {}
         for condition in conditions:
             # pdirs = os.listdir('data/%s/'%(condition))
 
@@ -127,13 +127,16 @@ class MyFrame(wx.Frame):
             print(pdirs)
             existing += pdirs # this is to decide on a new participant ID
 
+            # provisional:
+            leaners[condition] = pdirs
+
             # to decide on a condition, we need to have only the learners:
             # we got a list of participants, but we only care about the "learners"
             # lets find the learners, using their SUMMARY files
-            
-            # for folder in pdirs:
-            #     filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
-            #     print(filename)
+
+            for folder in pdirs:
+                filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
+                print(filename)
             #     summary = pd.read_csv(filename)
 
                 # take the last 16 trials of the rotated phase:
@@ -154,7 +157,9 @@ class MyFrame(wx.Frame):
 
         # decide on which condition to assign the participant:
         # - get list of numbers of participants in each condition
-        condition_Ns = [len(participants[k]) for k in participants.keys()]
+        # condition_Ns = [len(participants[k]) for k in participants.keys()]
+        
+        condition_Ns = [len(learners[k]) for k in learners.keys()]
 
         # - get the lowest number of participants in any condition
         lowN = np.min(condition_Ns)
