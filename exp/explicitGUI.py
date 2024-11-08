@@ -134,6 +134,8 @@ class MyFrame(wx.Frame):
             # we got a list of participants, but we only care about the "learners"
             # lets find the learners, using their SUMMARY files
 
+            condition_learners = []
+
             for folder in pdirs:
                 filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
                 print(filename)
