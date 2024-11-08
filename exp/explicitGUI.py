@@ -169,7 +169,7 @@ class MyFrame(wx.Frame):
 
                 # take the last 16 trials of the rotated phase:
                 rotated = summary.loc[(summary['task_idx']==5),]
-                rotend  = rotated.loc[(rotated['trial_idx']>4),]
+                rotend  = rotated.loc[(rotated['trial_idx']>96),]
                 meandev = rotend['reachdeviation_deg'].median()
                 rotation = list(rotend['rotation_deg'])[0]
                 meandev = -1 * np.sign(rotation) * meandev
