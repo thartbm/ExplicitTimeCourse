@@ -116,16 +116,26 @@ class MyFrame(wx.Frame):
                         'aiming60'  ]
 
         # we get the IDs for participants in each condition:
-        participants = {}
+        existing = {}
         for condition in conditions:
-            participantfolders = os.listdir('data/%s/'%(condition))
+            # pdirs = os.listdir('data/%s/'%(condition))
+
+            cdir = 'data/%s/'%(condition)
+            pdirs = next(os.walk(os.path.join(cdir,'.')))[1]
+
+            print(pdirs)
+            existing[condition] = pdirs # this is to decide on a new participant ID
+
+            # to decide on a condition, we need to have only the learners:
             # we got a list of participants, but we only care about the "learners"
             # lets find the learners, using their SUMMARY files
-            for folder in participantfolders:
-                summary = pd.read_csv('data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder))
+            for folder in pdirs:
+                filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
+                print(filename)
+                summary = pd.read_csv(filename)
                 # take the last 16 trials of the rotated phase:
                 # rotated = summary[summary['taskno']]
-                
+
             participants[condition] = participantfolders
 
         
