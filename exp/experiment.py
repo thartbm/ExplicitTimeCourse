@@ -423,7 +423,7 @@ def createTasks(cfg):
     #     stratinstr = stratinstr[::-1]
 
     tasktrials = [32,16,16]
-    tasktrials = [8,0,0]
+    # tasktrials = [8,0,0]
     taskrotation = [0,0,0]
     taskaiming = [True,True,True]
     taskcursor = [True,False,True]
@@ -446,8 +446,8 @@ def createTasks(cfg):
 
     # NOW FOR THE ROTATED PARTs:
 
-    # tasktrials = tasktrials + [120,24,24]
-    tasktrials = tasktrials + [8,0,0]
+    tasktrials = tasktrials + [120,24,24]
+    # tasktrials = tasktrials + [8,0,0]
     taskrotation = taskrotation + [-1 * cfg['rotation'], 0, -1 * cfg['rotation']]
     taskaiming = taskaiming + [True,True,True]
     # taskinstructions = taskinstructions + ['aim and reach for target',
