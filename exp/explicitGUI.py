@@ -151,14 +151,14 @@ class MyFrame(wx.Frame):
             pdirs = next(os.walk(os.path.join(cdir,'.')))[1]
 
             print(pdirs)
-            existing += pdirs # this is to decide on a new participant ID
-
-            # provisional:
-            # learners[condition] = pdirs
+            # we collect ALL existing participant IDs in one dictionary
+            # to decide on a new ID that doesn't yet exist
+            existing += pdirs
 
             # to decide on a condition, we need to have only the learners:
-            # we got a list of participants, but we only care about the "learners"
-            # lets find the learners, using their SUMMARY files
+            # we got a list of participants, lets find the learners, using their SUMMARY files
+            # the criterion is that they should be countering for at leats 50% of the rotation
+            # at the end of the 120 trial rotated phase (corrected for baseline performance)
 
             condition_learners = []
 
@@ -166,13 +166,21 @@ class MyFrame(wx.Frame):
                 filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
                 print(filename)
                 summary = pd.read_csv(filename)
+                
+                # calculate baseline:
+                aligned = summary.loc[((summary['task_idx'] == 2) & (summary['trial_idx'] > 24)) | ((summary['task_idx'] == 5) & (summary['trial_idx'] > 8)),]
+                baseline = aligned['reachdeviation_deg'].median()
 
-                # take the last 16 trials of the rotated phase:
-                rotated = summary.loc[(summary['task_idx']==5),]
-                rotend  = rotated.loc[(rotated['trial_idx']>96),]
-                meandev = rotend['reachdeviation_deg'].median()
-                rotation = list(rotend['rotation_deg'])[0]
+                # take the last 16 trials of the rotated phase, and apply baseline:
+                rotated = summary.loc[(summary['task_idx']==5) & (summary['trial_idx']>104),]
+                meandev = rotend['reachdeviation_deg'].median() - baseline
+
+                # need to know the rotation to decide cutoff and direction of test:
+                rotation = list(rotated['rotation_deg'])[0]
+                # normalize mean reach deviation to (ideally) go positive regardless of direction of rotation:
                 meandev = -1 * np.sign(rotation) * meandev
+
+                # compared reach deviation to criterion:
                 if meandev > (np.abs(rotation)/2):
                     print('%s is a learner'%(folder))
                     condition_learners += [folder]
