@@ -147,8 +147,9 @@ class MyFrame(wx.Frame):
         for condition in conditions:
             # pdirs = os.listdir('data/%s/'%(condition))
 
+            print('\n%s scan...'%(upper(condition)))
+
             cdir = 'data/%s/'%(condition)
-            print(cdir)
             cdirlist = os.listdir(cdir)
             # all content, need to select only the directories in there:
             pdirs = []
@@ -208,9 +209,9 @@ class MyFrame(wx.Frame):
                     print('%s is NOT a learner'%(folder))
                     non_learners += [folder]
 
-            print('learners:')
+            print('   learners:')
             print(condition_learners)
-            print('non-learners:')
+            print('   non-learners:')
             print(non_learners)
 
             learners[condition] = condition_learners
