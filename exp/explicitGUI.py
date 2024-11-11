@@ -148,7 +148,14 @@ class MyFrame(wx.Frame):
             # pdirs = os.listdir('data/%s/'%(condition))
 
             cdir = 'data/%s/'%(condition)
-            pdirs = next(os.walk(os.path.join(cdir,'.')))[1]
+            cdir = os.path.join(cdir, '.')
+            print(cdir)
+            cdirgen = os.walk(cdir)
+            cdircontent = next(cdirgen)
+            print(cdircontent)
+            pdirs = cdircontent[1]
+            print(pdirs)
+            # pdirs = next(os.walk(os.path.join(cdir,'.')))[1]
 
             print(pdirs)
             # we collect ALL existing participant IDs in one dictionary
