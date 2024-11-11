@@ -384,11 +384,11 @@ def createTasks(cfg):
     start = (180 - ((ntargets-1) * gap)) / 2
     targets = [(x * gap) + start for x in range(ntargets)]
 
-    # temp for cone stencil
-    gap = 2
-    # this can stay...
-    start = (180 - ((ntargets-1) * gap)) / 2
-    targets = [(x * gap) + start for x in range(ntargets)]
+    # # temp for cone stencil
+    # gap = 2
+    # # this can stay...
+    # start = (180 - ((ntargets-1) * gap)) / 2
+    # targets = [(x * gap) + start for x in range(ntargets)]
 
     cfg['targets'] = targets
 
