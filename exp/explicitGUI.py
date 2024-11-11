@@ -179,7 +179,7 @@ class MyFrame(wx.Frame):
 
             for folder in pdirs:
                 filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
-                print(filename)
+                # print(filename)
                 summary = pd.read_csv(filename)
                 
                 # calculate baseline:
@@ -189,11 +189,14 @@ class MyFrame(wx.Frame):
                 # take the last 16 trials of the rotated phase, and apply baseline:
                 rotated = summary.loc[(summary['task_idx']==5) & (summary['trial_idx']>104),]
                 meandev = rotated['reachdeviation_deg'].median() - baseline
-
+                
                 # need to know the rotation to decide cutoff and direction of test:
                 rotation = list(rotated['rotation_deg'])[0]
                 # normalize mean reach deviation to (ideally) go positive regardless of direction of rotation:
                 meandev = -1 * np.sign(rotation) * meandev
+                
+                print(rotation)
+                print(meandev)
 
                 # compared reach deviation to criterion:
                 if meandev > (np.abs(rotation)/2):
