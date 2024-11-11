@@ -148,6 +148,7 @@ class MyFrame(wx.Frame):
             # pdirs = os.listdir('data/%s/'%(condition))
 
             cdir = 'data/%s/'%(condition)
+            print(cdir)
             cdirlist = os.listdir(cdir)
             # all content, need to select only the directories in there:
             pdirs = []
@@ -165,7 +166,7 @@ class MyFrame(wx.Frame):
             # print(pdirs)
             # pdirs = next(os.walk(os.path.join(cdir,'.')))[1]
 
-            print(pdirs)
+            # print(pdirs)
             # we collect ALL existing participant IDs in one dictionary
             # to decide on a new ID that doesn't yet exist
             existing += pdirs
@@ -176,6 +177,7 @@ class MyFrame(wx.Frame):
             # at the end of the 120 trial rotated phase (corrected for baseline performance)
 
             condition_learners = []
+            non_learners = []
 
             for folder in pdirs:
                 filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
@@ -195,15 +197,21 @@ class MyFrame(wx.Frame):
                 # normalize mean reach deviation to (ideally) go positive regardless of direction of rotation:
                 meandev = -1 * np.sign(rotation) * meandev
                 
-                print(rotation)
-                print(meandev)
+                # print(rotation)
+                # print(meandev)
 
                 # compared reach deviation to criterion:
                 if meandev > (np.abs(rotation)/2):
-                    print('%s is a learner'%(folder))
+                    # print('%s is a learner'%(folder))
                     condition_learners += [folder]
                 else:
                     print('%s is NOT a learner'%(folder))
+                    non_learners += [folder]
+
+            print('learners:')
+            print(condition_learners)
+            print('non-learners:')
+            print(non_learners)
 
             learners[condition] = condition_learners
 
