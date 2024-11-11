@@ -147,7 +147,7 @@ class MyFrame(wx.Frame):
         for condition in conditions:
             # pdirs = os.listdir('data/%s/'%(condition))
 
-            print('\n%s scan...'%(upper(condition)))
+            print('\n%s scan...'%(condition.upper()))
 
             cdir = 'data/%s/'%(condition)
             cdirlist = os.listdir(cdir)
