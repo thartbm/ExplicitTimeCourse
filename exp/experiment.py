@@ -580,6 +580,11 @@ def doTrial(cfg):
     theta = (rotation/180.)*np.pi
     R = np.array([[np.cos(theta),-1*np.sin(theta)],[np.sin(theta),np.cos(theta)]],order='C')
 
+    untheta = -1 * targetangle
+    unR = np.array([[np.cos(untheta),-1*np.sin(untheta)],[np.sin(untheta),np.cos(untheta)]],order='C')
+    retheta = targetangle
+    reR = np.array([[np.cos(retheta),-1*np.sin(retheta)],[np.sin(retheta),np.cos(retheta)]],order='C')
+
     trialDone = False
     phase = 0
 
@@ -608,9 +613,10 @@ def doTrial(cfg):
             cursorangle = np.arctan2(cursorpos[1],cursorpos[0])
         else:
             # zero-clamped trial, where the cursor always goes to the target:
-            polpos = cart2pol(X,Y, units='rad')
-            cursorpos = pol2cart(targetangle+jitter, polpos[1], units='rad')
-            cursorangle = polpos[0]
+            unrotated = list(unR.dot(np.array([[X],[Y]])).flatten())
+            unX = unrotated[0]
+            cursorpos = list(reR.dot(np.array([[unX],[0]])).flatten())
+
 
         cfg['cursor'].pos = cursorpos
 
@@ -667,6 +673,7 @@ def doTrial(cfg):
             # else:
             #print('no-cursor, phase 1 or 3')
             if (np.sqrt(sum([c**2 for c in cursorpos])) < (0.15 * cfg['targetdistance'])):
+                cfg['cursor'].pos = [X,Y] # same as actual mouse pos?
                 cfg['cursor'].draw()
             else:
 
