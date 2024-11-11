@@ -148,14 +148,21 @@ class MyFrame(wx.Frame):
             # pdirs = os.listdir('data/%s/'%(condition))
 
             cdir = 'data/%s/'%(condition)
-            cdir = os.path.join(cdir, '.')
-            print(cdir)
-            cdirgen = os.walk(cdir)
-            print(cdirgen)
-            cdircontent = next(cdirgen)
-            print(cdircontent)
-            pdirs = cdircontent[1]
-            print(pdirs)
+            cdirlist = os.listdir(cdir)
+            # all content, need to select only the directories in there:
+            pdirs = []
+            for entry in cdirlist:
+                if os.path.isdir(os.path.join(cdir, entry)):
+                    pdirs += [entry]
+
+            # cdir = os.path.join(cdir, '.')
+            # print(cdir)
+            # cdirgen = os.walk(cdir)
+            # print(cdirgen)
+            # cdircontent = next(cdirgen)
+            # print(cdircontent)
+            # pdirs = cdircontent[1]
+            # print(pdirs)
             # pdirs = next(os.walk(os.path.join(cdir,'.')))[1]
 
             print(pdirs)
