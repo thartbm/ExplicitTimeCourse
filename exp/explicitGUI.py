@@ -151,6 +151,7 @@ class MyFrame(wx.Frame):
             cdir = os.path.join(cdir, '.')
             print(cdir)
             cdirgen = os.walk(cdir)
+            print(cdirgen)
             cdircontent = next(cdirgen)
             print(cdircontent)
             pdirs = cdircontent[1]
