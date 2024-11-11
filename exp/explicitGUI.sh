@@ -1,2 +1,2 @@
-cd Science/ExplicitTimeCourse/exp
+cd ~/Science/ExplicitTimeCourse/exp
 ipython3 explicitGUI.py
