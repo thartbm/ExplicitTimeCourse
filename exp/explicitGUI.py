@@ -186,7 +186,7 @@ class MyFrame(wx.Frame):
 
                 if not(os.path.isfile(filename)):
                     non_learners += [folder]
-                    next()
+                    continue
 
                 summary = pd.read_csv(filename)
                 
