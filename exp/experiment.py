@@ -258,7 +258,7 @@ def createEnvironment(cfg):
                                     edges=180,
                                     lineWidth=3, 
                                     lineColorSpace='rgb', 
-                                    lineColor='#000099', 
+                                    lineColor='#0000CC', 
                                     fillColorSpace='rgb', 
                                     fillColor=None          )
 
@@ -422,15 +422,17 @@ def createTasks(cfg):
     #     strategies = strategies[::-1]
     #     stratinstr = stratinstr[::-1]
 
-    tasktrials = [32,16,16]
+    tasktrials = [24,16,8,16,16]
     # tasktrials = [8,0,0]
-    taskrotation = [0,0,0]
-    taskaiming = [True,True,True]
-    taskcursor = [True,False,True]
-    taskstrategy = ['NA','NA','NA']
-    taskinstructions = ['aim\n&\nreach for target',
+    taskrotation = [0,0,0,0,0]
+    taskaiming = [True,True,True,True,True]
+    taskcursor = [True,False,True,True,True]
+    taskstrategy = ['NA','NA','NA','NA','NA']
+    taskinstructions = ['AIM\n&\nreach for target',
                         '',
-                        '']
+                        '',
+                        'SWITCH to LEFT hand',
+                        'SWITCH back to RIGHT hand']
 
 
 
@@ -452,7 +454,7 @@ def createTasks(cfg):
     taskaiming = taskaiming + [True,True,True]
     # taskinstructions = taskinstructions + ['aim and reach for target',
     #                                         stratinstr]
-    taskinstructions = taskinstructions + ['','','important:\n\nSWITCH HAND']
+    taskinstructions = taskinstructions + ['','','SWITCH to LEFT hand']
     taskcursor = taskcursor + [True,False,True]
     taskstrategy = taskstrategy + ['NA','NA','NA']
 
@@ -551,7 +553,8 @@ def doTrial(cfg):
     cfg['target'].pos = targetpos
 
     # hold home before reach:
-    holdTime = 0.5
+    # holdTime = 0.5
+    holdTime = 0
 
     # phase 0: do pre-reach aiming if required:
     doAim = cfg['tasks'][cfg['taskno']]['aiming'][cfg['trialno']]

@@ -257,7 +257,7 @@ def createEnvironment(cfg):
                                     edges=180,
                                     lineWidth=3, 
                                     lineColorSpace='rgb', 
-                                    lineColor='#000099', 
+                                    lineColor='#0000CC', 
                                     fillColorSpace='rgb', 
                                     fillColor=None          )
 
@@ -548,7 +548,8 @@ def doTrial(cfg):
     cfg['target'].pos = targetpos
 
     # hold home before reach:
-    holdTime = 0.5
+    # holdTime = 0.5
+    holdTime = 0
 
     # phase 0: do pre-reach aiming if required:
     doAim = cfg['tasks'][cfg['taskno']]['aiming'][cfg['trialno']]
