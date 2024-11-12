@@ -183,6 +183,11 @@ class MyFrame(wx.Frame):
             for folder in pdirs:
                 filename = 'data/%s/%s/SUMMARY_%s_%s.csv'%(condition, folder, condition, folder)
                 # print(filename)
+
+                if not(os.path.isfile(filename)):
+                    non_learners += [folder]
+                    next()
+
                 summary = pd.read_csv(filename)
                 
                 # calculate baseline:
