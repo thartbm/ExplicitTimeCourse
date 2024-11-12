@@ -791,19 +791,23 @@ def doAiming(cfg):
 
     startaiming = time.time()
 
+    needleMoved = False
+
     while(not(aimDecided)):
 
         keys = event.getKeys(keyList=['num_enter'])
-        if ('num_enter' in keys):
+        if ('num_enter' in keys) and needleMoved:
             cfg['aim'] = -1 * cfg['aim_arrow'].ori
             aimDecided = True
             stopaiming = time.time()
 
         if cfg['keyboard'][key.NUM_LEFT]:
             cfg['aim_arrow'].ori = cfg['aim_arrow'].ori - 0.25
+            needleMoved = True
             #print(cfg['aim_arrow'].ori)
         if cfg['keyboard'][key.NUM_RIGHT]:
             cfg['aim_arrow'].ori = cfg['aim_arrow'].ori + 0.25
+            needleMoved = True
             #print(cfg['aim_arrow'].ori)
         #print(cfg['keyboard'])
         cfg['aim_arrow'].ori = cfg['aim_arrow'].ori % 360
