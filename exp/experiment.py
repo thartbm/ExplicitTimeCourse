@@ -554,7 +554,7 @@ def doTrial(cfg):
 
     # hold home before reach:
     # holdTime = 0.5
-    holdTime = 0.3
+    holdTime = 0.4
 
     # phase 0: do pre-reach aiming if required:
     doAim = cfg['tasks'][cfg['taskno']]['aiming'][cfg['trialno']]
