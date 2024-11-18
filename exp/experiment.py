@@ -448,15 +448,16 @@ def createTasks(cfg):
 
     # NOW FOR THE ROTATED PARTs:
 
-    tasktrials = tasktrials + [120,24,24]
+    tasktrials = tasktrials + [8, 120,24,24]
     # tasktrials = tasktrials + [8,0,0]
-    taskrotation = taskrotation + [-1 * cfg['rotation'], 0, -1 * cfg['rotation']]
-    taskaiming = taskaiming + [True,True,True]
+    taskrotation = taskrotation + [0, -1 * cfg['rotation'], 0, -1 * cfg['rotation']]
+    taskaiming = taskaiming + [True, True,True,True]
     # taskinstructions = taskinstructions + ['aim and reach for target',
     #                                         stratinstr]
-    taskinstructions = taskinstructions + ['','','SWITCH to LEFT hand']
-    taskcursor = taskcursor + [True,False,True]
-    taskstrategy = taskstrategy + ['NA','NA','NA']
+    taskinstructions = taskinstructions + ['Reminder:\nThe arrow\nshould indicate in which direction you will aim your\nhand movement,\nsuch that the\ncursor\nwill go straight to the\ntarget.',
+        '','','SWITCH to LEFT hand']
+    taskcursor = taskcursor + [True,True,False,True]
+    taskstrategy = taskstrategy + ['NA','NA','NA','NA']
 
 
     for taskno in range(len(tasktrials)):
