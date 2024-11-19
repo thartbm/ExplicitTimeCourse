@@ -191,7 +191,7 @@ class MyFrame(wx.Frame):
                 summary = pd.read_csv(filename)
                 
                 # calculate baseline:
-                aligned = summary.loc[((summary['task_idx'] == 2) & (summary['trial_idx'] > 24)) | ((summary['task_idx'] == 4) & (summary['trial_idx'] > 8)),]
+                aligned = summary.loc[((summary['task_idx'] == 2) & (summary['trial_idx'] > 16)) | ((summary['task_idx'] == 6) & (summary['trial_idx'] > 8)),]
                 baseline = aligned['reachdeviation_deg'].median()
 
                 # take the last 16 trials of the rotated phase, and apply baseline:
