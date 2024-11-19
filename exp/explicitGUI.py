@@ -195,7 +195,7 @@ class MyFrame(wx.Frame):
                 baseline = aligned['reachdeviation_deg'].median()
 
                 # take the last 16 trials of the rotated phase, and apply baseline:
-                rotated = summary.loc[(summary['task_idx']==6) & (summary['trial_idx']>104),]
+                rotated = summary.loc[(summary['task_idx']==8) & (summary['trial_idx']>104),]
                 meandev = rotated['reachdeviation_deg'].median() - baseline
                 
                 # need to know the rotation to decide cutoff and direction of test:
