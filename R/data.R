@@ -31,3 +31,17 @@ downloadImplicitAiming <- function() {
   
 }
 
+downloadExplicitTimecourse <- function() {
+  
+  # directory should already exist in the github repo
+  Reach::downloadOSFdata( repository = '6g3h7',
+                          filelist = list('data'=c('summary_data_files.zip')), 
+                          folder = 'exp/data/',
+                          overwrite = TRUE,
+                          unzip = TRUE,
+                          removezips = TRUE)
+  
+  
+  
+}
+
