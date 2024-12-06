@@ -1,5 +1,5 @@
 
-simpleTimeCoursePlots <- function() {
+oldTimeCoursePlots <- function() {
   
   # showing the same thing for two data sets:
   # - from Urooj's aiming group in the aiming effects / additivity project
@@ -109,4 +109,46 @@ simpleTimeCoursePlots <- function() {
        xlim=c(0,1),ylim=c(-15,60),
        bty='n',ax=F)
    
+}
+
+newTimeCoursePlots <- function() {
+  
+  
+  
+  layout(mat=matrix(1:5,ncol=1))
+  par(mar=c(3.5,3.5,1,0.1))
+  
+  for (rotation in c(20,30,40,50,60)) {
+    
+    df <- loadTimeCourseData(rotations=c(rotation))
+    
+    plot( -1000,-1000,
+          main='', xlab='', ylab='',
+          xlim=c(-9,25), ylim=c(-15,35),
+          ax=F, bty='n')
+    
+    lines(x=c(-9,0,0,24),
+          y=c(0,0,rotation,rotation),
+          col='#CCCCCC')
+    lines(x=c(0,24),
+          y=c(0,0),
+          col='#CCCCCC')
+    
+    participants <- unique(df$participant)
+    
+    for (participant in participants) {
+      pdf <- df[which(df$participant == participant),]
+      pdf <- pdf[which(pdf$task_idx %in% c(7,8) & pdf$trial_idx < 25),]
+      strategy <- pdf$aimdeviation_deg
+      lines(x=c(-8:23),
+            y=strategy,
+            col='#FF000033',
+            lw=2)
+    }
+    
+    axis(side=1, at=c(-8,0,8,16,24))
+    axis(side=2, at=c(-10,10,30))
+    
+  }
+  
 }
