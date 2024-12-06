@@ -31,6 +31,8 @@ downloadImplicitAiming <- function() {
   
 }
 
+# current data set -----
+
 downloadExplicitTimecourse <- function() {
   
   # directory should already exist in the github repo
@@ -44,4 +46,5 @@ downloadExplicitTimecourse <- function() {
   
   
 }
+
 
