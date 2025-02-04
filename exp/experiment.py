@@ -264,6 +264,8 @@ def createEnvironment(cfg):
 
 
     cfg['instruction'] = visual.TextStim(win=cfg['win'], text='', pos=[0,0], colorSpace='rgb', color='#999999', flipVert=True)
+n
+    cfg['aimtext'] = visual.TextStim(win=cfg['win'], text='“HAND movement aim\(not cursor)” ', pos=[0,9.5], colorSpace='rgb', color='#999999', flipVert=True)
 
     #arrowvertices = ((-.33,-.33),(6.33,-.33),(6,-1),(8,0),(6,1),(6.33,.33),(-.33,.33))
     arrowvertices = ((-.02,-.02),(0.82,-.02),(0.8,-.08),(1,0),(0.8,.08),(0.82,.02),(-.02,.02))
@@ -815,6 +817,7 @@ def doAiming(cfg):
 
 
         cfg['target'].draw()
+        cfg['aimtext'].draw()
         cfg['aim_arrow'].draw()
         cfg['win'].flip()
 
