@@ -31,6 +31,21 @@ downloadImplicitAiming <- function() {
   
 }
 
+# Taylor data -----
+
+getBTsizeData <- function() {
+  
+  matlabArray <- R.matlab::readMat('~/Science/Additivity/data/Taylor/Bond2015_RotationSizeExp.mat')[[1]]
+  
+  explicit <- matlabArray[,,1]$explicit
+  
+  adaptation <- matlabArray[,,1]$hand.angle
+  
+  return(list('explicit'=explicit, 'adaptation'=adaptation))
+  
+}
+
+
 # current data set -----
 
 downloadExplicitTimecourse <- function() {

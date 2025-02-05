@@ -135,8 +135,9 @@ class MyFrame(wx.Frame):
     def setIDandTask(self):
 
         # these are the conditions we are running:
-        conditions = [  'aiming20',
-                        'aiming30',
+        conditions = [  
+                        # 'aiming20',
+                        # 'aiming30',
                         'aiming40',
                         'aiming50',
                         'aiming60'  ]
