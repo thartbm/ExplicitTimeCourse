@@ -31,11 +31,11 @@ downloadImplicitAiming <- function() {
   
 }
 
-# Taylor data -----
+# Bond & Taylor data -----
 
-getBTsizeData <- function() {
+getBondSizeData <- function() {
   
-  matlabArray <- R.matlab::readMat('~/Science/Additivity/data/Taylor/Bond2015_RotationSizeExp.mat')[[1]]
+  matlabArray <- R.matlab::readMat( 'data/bond_2015/Bond2015_RotationSizeExp.mat')[[1]]
   
   explicit <- matlabArray[,,1]$explicit
   
@@ -46,6 +46,35 @@ getBTsizeData <- function() {
 }
 
 
+convertWiltersonDataHDF5 <- function() {
+  
+  mtlbData <- hdf5r::H5File$new(filename='data/wilterson_2021/RotationData.mat', mode='r+')
+  
+  # this lists all components of all the structs in there:
+  # mtlbData$ls(recursive=TRUE)
+  
+  # we want:
+  # "data/aimAngleCommon"
+  # "data/handHeadAngleCommon"
+  
+  rotation <- abs(t(mtlbData[['data/rotation']]$read()))[,1]
+
+  aiming <- as.data.frame(t(mtlbData[['data/aimAngleCommon']]$read()))
+  names(aiming) <- sprintf('p%02d',c(1:12))
+  aiming$rotation <- rotation
+  aiming <- aiming[c(1:800),]
+  
+  adaptation <- as.data.frame(t(mtlbData[['data/handHeadAngleCommon']]$read()))
+  names(adaptation) <- sprintf('p%02d',c(1:12))
+  adaptation$rotation <- rotation
+  adaptation <- adaptation[c(1:800),]
+  
+  write.csv(aiming, 'data/wilterson_2021/aiming.csv', quote=F, row.names=F)
+  write.csv(adaptation, 'data/wilterson_2021/adaptation.csv', quote=F, row.names=F)
+  
+  return(list('explicit'=aiming, 'adaptation'=adaptation))
+  
+}
 # current data set -----
 
 downloadExplicitTimecourse <- function() {

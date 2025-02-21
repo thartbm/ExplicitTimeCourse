@@ -23,7 +23,8 @@ loadTimeCourseData <- function(rotations=c(20,30,40,50,60)) {
 
 getRotationParticipants <- function(rotation) {
   
-  path <- sprintf('exp/data/aiming%d/',rotation)
+  # path <- sprintf('exp/data/aiming%d/',rotation)
+  path <- sprintf('exp/explain/aiming%d/',rotation)
   
   # allcsvfiles <- list.files(path=folder, pattern='*.csv')
   
@@ -99,7 +100,8 @@ getRotationTimeCourseData <- function(rotation) {
   
   participants <- getRotationParticipants(rotation)
   
-  folder <- sprintf('exp/data/aiming%d/',rotation)
+  # folder <- sprintf('exp/data/aiming%d/',rotation)
+  folder <- sprintf('exp/explain/aiming%d/',rotation)
   
   df <- NA
   

@@ -292,6 +292,14 @@ plotBondTaylorExplicit <- function() {
       }
     }
     
+    
+    # density
+    plot(x=1000,y=-1000,
+         main=sprintf('%d° explicit',c(15,30,60,90)[rots]),xlab='',ylab='',
+         xlim=c(-8,41),ylim=c(-12,102),
+         ax=F,bty='n')
+    
+    
     img_info <- hist2d(x=df, nbins=NA, edges=list(seq(-8.5,40.5,1),seq(-2.5*5.625,18.5*5.625,5.625)))
     img <- img_info$freq2D
     
@@ -311,6 +319,83 @@ plotBondTaylorExplicit <- function() {
     axis(side=2,at=seq(0,90,30))
     
   }
+  
+}
+
+
+plotWiltersonTaylor <- function() {
+  
+  WT <- convertWiltersonDataHDF5()
+  
+  explicit <- WT$explicit
+  adaptation <- WT$adaptation
+  
+  
+  layout(mat=matrix(c(1:2),byrow=TRUE,ncol=2))
+  par(mar=c(3.0,3.0,2.5,0.1))
+  
+  trials <- c(184:232)
+  
+  
+  # lines:
+  plot(x=1000,y=-1000,
+       main='45° aiming',xlab='',ylab='',
+       xlim=c(-8,41),ylim=c(-15,60), 
+       ax=F,bty='n')
+  
+  # ideal aiming response:
+  lines(x=c(-8,0,0,41),
+        y=c(rep(0,2),rep(45,2)),
+        col='#00F',lty=1,lw=2)
+  
+  df <- NA
+  for (ppno in c(1:12)) {
+    aimlist <- explicit[trials,sprintf('p%02d',ppno)]
+    
+    lines(x=c(-8:40),
+          y=aimlist,
+          col='#F00')
+    
+    pdf <- data.frame(x=c(-8:40),
+                      y=aimlist,
+                      ppno=ppno)
+    
+    if (is.data.frame(df)){
+      df <- rbind(df,pdf)
+    } else {
+      df <- pdf
+    }
+  }
+  
+  axis(side=1,at=seq(-8,40,8))
+  axis(side=2,at=seq(0,45,15))
+  
+  # denisty:
+  
+  plot(x=1000,y=-1000,
+       main='45° aiming',xlab='',ylab='',
+       xlim=c(-8,41),ylim=c(-15,60), 
+       ax=F,bty='n')
+  
+  
+  img_info <- hist2d(x=df, nbins=NA, edges=list(seq(-8.5,40.5,1),seq(-2.5*5.625,18.5*5.625,5.625)))
+  img <- img_info$freq2D
+  
+  img <- log(img + 1)
+  
+  image(x=img_info$x.edges,
+        y=img_info$y.edges,
+        z=img,
+        add=TRUE)
+  
+  # ideal aiming response:
+  lines(x=c(-8,0,0,41),
+        y=c(rep(0,2),rep(45,2)),
+        col='#00F',lty=1,lw=2)
+  
+  axis(side=1,at=seq(-8,40,8))
+  axis(side=2,at=seq(0,45,15))
+  
   
 }
 
@@ -719,14 +804,15 @@ newTimeCoursePlots <- function() {
   demographics <- read.csv('exp/data/demographics.csv', stringsAsFactors = F)
   ID25 <- demographics$Participant.ID[which(grepl("2024", demographics$Timestamp))]
   
-  layout(mat=matrix(1:5,ncol=1))
+  layout(mat=matrix(1:3,ncol=1))
   par(mar=c(3.5,3.5,1,0.1))
   
-  for (rotation in c(20,30,40,50,60)) {
+  for (rotation in c(40,50,60)) {
     
     df <- loadTimeCourseData(rotations=c(rotation))
+    str(df)
     
-    df <- df[which(df$participant %in% ID25),]
+    # df <- df[which(df$participant %in% ID25),]
     
     plot( -1000,-1000,
           main='', xlab='', ylab='',
