@@ -682,7 +682,11 @@ def doTrial(cfg):
                 cfg['circle'].draw()
                 if cursordistance >= cfg['targetdistance']:
                     phase = 3
-            else:
+            if cursortype == 'clamped':
+                cfg['cursor'].draw()
+                if cursordistance >= cfg['targetdistance']:
+                    phase = 3
+            if cursortype == 'regular':
                 cfg['cursor'].draw()
                 if ( np.sqrt( np.sum( (np.array(cursorpos) - np.array(targetpos))**2 ) ) ) < cfg['radius']:
                     phase = 3
