@@ -474,7 +474,12 @@ def createTasks(cfg):
         for iter in range(int(tasktrials[taskno]/len(targets))):
             random.shuffle(targets)
             ttargets = ttargets + targets
-            trotation = trotation + list(np.repeat(taskrotation[taskno],len(targets)))
+            if np.isnan(taskrotation[taskno]):
+                wildclamps = [-80,-80,80,80,-100,-100,100,100]
+                random.shuffle(wildclamps)
+                trotation = trotation + wildclamps
+            else:
+                trotation = trotation + list(np.repeat(taskrotation[taskno],len(targets)))
             taiming = taiming + list(np.repeat(taskaiming[taskno],len(targets)))
             random.shuffle(aimingoffsets)
             taimdev = taimdev + aimingoffsets
