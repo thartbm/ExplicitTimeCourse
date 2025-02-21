@@ -434,19 +434,21 @@ def createTasks(cfg):
     #     strategies = strategies[::-1]
     #     stratinstr = stratinstr[::-1]
 
-    tasktrials = [       24,        16,       16,        8,       8,         16,       16]
+    tasktrials = [       24,        16,       16,        8,       8,          8,        8,         8,        8]
     # tasktrials = [8,0,0]
-    taskrotation = [      0,         0,        0,   np.NaN,       0,          0,        0]
-    taskaiming = [     True,     False,     True,    False,     True,     False,     True]
+    taskrotation = [      0,         0,        0,   np.NaN,       0,          0,        0,         0,        0]
+    taskaiming = [     True,     False,     True,    False,     True,     False,     True,     False,     True]
     # taskcursor = [True,False,True,True,True]
 
-    taskcursor = ['regular','nocursor','regular','clamped','regular','nocursor','regular']
-    taskstrategy = [   'NA',      'NA',     'NA',     'NA',     'NA',      'NA',     'NA']
+    taskcursor = ['regular','nocursor','regular','clamped','regular','nocursor','regular','nocursor','regular']
+    taskstrategy = [   'NA',      'NA',     'NA',     'NA',     'NA',      'NA',     'NA',      'NA',     'NA']
 
     taskinstructions = ['AIM\n&\nmove cursor to target',
                         'move hand to target',
                         'AIM\n&\nmove cursor to target',
                         'the cursor is NOT your hand\n\nmove slow\nobserve the difference',
+                        'AIM\n&\nmove cursor to target',
+                        'move hand to target',
                         'AIM\n&\nmove cursor to target',
                         'move hand to target',
                         'AIM\n&\nmove cursor to target']
@@ -468,10 +470,10 @@ def createTasks(cfg):
     tasktrials = tasktrials + [8, 120,24]
     # tasktrials = tasktrials + [8,0,0]
     taskrotation = taskrotation + [0, -1 * cfg['rotation'], 0, -1 * cfg['rotation']]
-    taskaiming = taskaiming + [True, True,True,True]
+    taskaiming = taskaiming + [True, True, False]
     # taskinstructions = taskinstructions + ['aim and reach for target',
     #                                         stratinstr]
-    taskinstructions = taskinstructions + ['Reminder:\nThe arrow\nshould indicate in which direction you will aim your\nhand movement,\nsuch that the\ncursor\nwill go straight to the\ntarget.',
+    taskinstructions = taskinstructions + ['Reminder:\n\nThe arrow should indicate in which direction you will aim your\n\nHAND movement,\n\nsuch that the CURSOR will go straight to the\ntarget.',
         '','']
     taskcursor = taskcursor + ['regular','regular','nocursor']
     taskstrategy = taskstrategy + ['NA','NA','NA']
