@@ -68,7 +68,7 @@ class MyFrame(wx.Frame):
         # end wxGlade
 
         # newURL = 'https://yorkufoh.ca1.qualtrics.com/jfe/form/SV_cZ7siSsepnvqtOS?id=%s'%(self.text_participantID.GetLabel())
-        newURL = 'https://docs.google.com/forms/d/e/1FAIpQLSdZylS-xmd4rS0BdjeqWfAK2m7LfZvaRKMJZGGanh9aFRZ00A/viewform?usp=pp_url&entry.1851916630=%s'%(self.text_participantID.GetLabel())
+        newURL = 'https://docs.google.com/forms/d/e/1FAIpQLSdZylS-xmd4rS0BdjeqWfAK2m7LfZvaRKMJZGGanh9aFRZ00A/viewform?usp=pp_url&entry.1851916630=pid%s'%(self.text_participantID.GetLabel())
         self.hyperlink_qualtrics.SetURL(newURL)
         self.hyperlink_qualtrics.SetLabel('questionnaire')
 
