@@ -244,6 +244,16 @@ def createEnvironment(cfg):
                                     fillColorSpace='rgb', 
                                     fillColor='#990000'     )
 
+
+    # cfg['nocursor'] = visual.Circle(  win=cfg['win'], 
+    #                                   radius=cfg['radius'], 
+    #                                   lineWidth=3, 
+    #                                   lineColorSpace='rgb', 
+    #                                   lineColor='#990000', 
+    #                                   fillColorSpace='rgb', 
+    #                                   fillColor=None     )
+
+
     cfg['target'] = visual.Circle(  win=cfg['win'], 
                                     radius=cfg['radius'], 
                                     lineWidth=3, 
@@ -258,7 +268,7 @@ def createEnvironment(cfg):
                                     edges=180,
                                     lineWidth=3, 
                                     lineColorSpace='rgb', 
-                                    lineColor='#0000CC', 
+                                    lineColor='#990000', 
                                     fillColorSpace='rgb', 
                                     fillColor=None          )
 
@@ -586,7 +596,7 @@ def doTrial(cfg):
 
 
     # trials need to know whether or not there is a cursor
-    showcursor = cfg['tasks'][cfg['taskno']]['cursor'][cfg['trialno']]
+    cursortype = cfg['tasks'][cfg['taskno']]['cursor'][cfg['trialno']]
 
     # for trials with / without strategy, we should record that:
     usestrategy = cfg['tasks'][cfg['taskno']]['strategy'][cfg['trialno']]
@@ -621,20 +631,41 @@ def doTrial(cfg):
     while not(trialDone):
 
         [X,Y,T] = cfg['mouse'].getPos()
+        cursordistance = (X**2 + Y**2)**(1/2)
 
-        if showcursor:
+        # if showcursor:
+        #     # regular trial, with participant controlled (sometime rotated) cursor:
+        #     # cfg['cursor'].pos = cursorpos
+        #     cursorpos = list(R.dot(np.array([[X],[Y]])).flatten())
+        #     cursorangle = np.arctan2(cursorpos[1],cursorpos[0])
+        # else:
+        #     # zero-clamped trial, where the cursor always goes to the target:
+        #     unrotated = list(unR.dot(np.array([[X],[Y]])).flatten())
+        #     unX = unrotated[0]
+        #     cursorpos = list(reR.dot(np.array([[unX],[0]])).flatten())
+
+
+        if cursortype == 'regular':
             # regular trial, with participant controlled (sometime rotated) cursor:
             # cfg['cursor'].pos = cursorpos
             cursorpos = list(R.dot(np.array([[X],[Y]])).flatten())
             cursorangle = np.arctan2(cursorpos[1],cursorpos[0])
-        else:
-            # zero-clamped trial, where the cursor always goes to the target:
+            cfg['cursor'].pos = cursorpos
+        
+        if cursortype == 'clamped':
+            # wild-clamped trial, where the cursor always misses the target:
             unrotated = list(unR.dot(np.array([[X],[Y]])).flatten())
             unX = unrotated[0]
             cursorpos = list(reR.dot(np.array([[unX],[0]])).flatten())
+            cX, cY = cursorpos[0], cursorpos[1]
+            cursorpos = list(R.dot(np.array([[cX],[cY]])).flatten())
+            cfg['cursor'].pos = cursorpos
 
+        if cursortype == 'nocursor':
+            # cfg['circle'].pos = [0,0]
+            cursorpos = [0,0]
+            cfg['circle'].radius = cursordistance
 
-        cfg['cursor'].pos = cursorpos
 
         mouseX.append(X)
         mouseY.append(Y)
@@ -647,20 +678,28 @@ def doTrial(cfg):
         if (phase == 2):
             cfg['target'].draw()
             # if showcursor:
-            cfg['cursor'].draw()
-            if ( np.sqrt( np.sum( (np.array(cursorpos) - np.array(targetpos))**2 ) ) ) < cfg['radius']:
-                phase = 3
+            if cursortype == 'nocursor':
+                cfg['circle'].draw()
+                if cursordistance >= cfg['targetdistance']:
+                    phase = 3
             else:
-                #print('no-cursor, phase 2')
-                idx = np.argmin( abs( np.array(time_s)+0.250-time_s[-1] ) )
-                if ( np.sqrt(mouseX[-1]**2 + mouseY[-1]**2) ) > (cfg['targetdistance']*.5):
-                    distance = np.sum( np.sqrt(np.diff(np.array([mouseX[idx:]]))**2 + np.diff(np.array([mouseY[idx:]]))**2) )
-                    if distance < (0.01 * cfg['targetdistance']):
-                        phase = 3
+                cfg['cursor'].draw()
+                if ( np.sqrt( np.sum( (np.array(cursorpos) - np.array(targetpos))**2 ) ) ) < cfg['radius']:
+                    phase = 3
+
+            # no-cursors with a stop-criterion (using a distance criterion now):
+            # else:
+            #     #print('no-cursor, phase 2')
+            #     idx = np.argmin( abs( np.array(time_s)+0.250-time_s[-1] ) )
+            #     if ( np.sqrt(mouseX[-1]**2 + mouseY[-1]**2) ) > (cfg['targetdistance']*.5):
+            #         distance = np.sum( np.sqrt(np.diff(np.array([mouseX[idx:]]))**2 + np.diff(np.array([mouseY[idx:]]))**2) )
+            #         if distance < (0.01 * cfg['targetdistance']):
+            #             phase = 3
+
             if beyond2:
                 devsample.append(0)
             else:
-                if (np.sqrt(np.sum(np.array(cursorpos)**2)) > 2):
+                if (cursordistance > 2):
                     beyond2 = True
                     devsample.append(1)
                 else:
@@ -675,7 +714,7 @@ def doTrial(cfg):
             if (time.time() > (phaseOneStart + holdTime)):
                 # held the home position for long enough, going to phase 2:
                 phase = 2
-            if (np.sqrt(np.sum(np.array(cursorpos)**2)) > cfg['radius']):
+            if (cursordistance > cfg['radius']):
                 # hold not maintained, restart phase 0:
                 phase = 0
 
@@ -688,7 +727,7 @@ def doTrial(cfg):
             # cfg['cursor'].draw()
             # else:
             #print('no-cursor, phase 1 or 3')
-            if (np.sqrt(sum([c**2 for c in cursorpos])) < (0.15 * cfg['targetdistance'])):
+            if (cursordistance < (0.15 * cfg['targetdistance'])):
                 cfg['cursor'].pos = [X,Y] # same as actual mouse pos?
                 cfg['cursor'].draw()
             else:
@@ -700,12 +739,12 @@ def doTrial(cfg):
                 # cfg['home_arrow'].draw()
 
                 # use circle feedback instead:
-                cfg['circle'].radius = np.sqrt(sum([c**2 for c in cursorpos]))
+                cfg['circle'].radius = cursordistance
                 cfg['circle'].draw()
 
 
             #print([sp.sqrt(sp.sum(sp.array(cursorpos)**2)), (0.025 * cfg['NSU'])])
-            if (np.sqrt(np.sum(np.array(cursorpos)**2)) < cfg['radius']):
+            if (cursordistance < cfg['radius']):
                 if phase == 0:
                     phase = 1
                     phaseOneStart = time.time()
@@ -730,7 +769,8 @@ def doTrial(cfg):
     targety = [targetpos[1]] * nsamples
     rotation_deg = [rotation] * nsamples
     doaiming_bool = [cfg['tasks'][cfg['taskno']]['aiming'][cfg['trialno']]] * nsamples
-    showcursor_bool = [showcursor] * nsamples
+    # showcursor_bool = [showcursor] * nsamples
+    cursortype_str = [cursortype] * nsamples
     usestrategy_cat = [usestrategy] * nsamples
 
     cutime_ms = [int((t - cfg['expstart']) * 1000) for t in time_s]
@@ -760,13 +800,14 @@ def doTrial(cfg):
                   'targetangle_deg'  : targetangle_deg,
                   'targetx_cm'       : targetx,
                   'targety_cm'       : targety,
+                  'cursortype'       : cursortype_str,
                   'rotation_deg'     : rotation_deg,
                   'doaiming_bool'    : doaiming_bool,
                   'aimstart_deg'     : aimstart_deg,
                   'aim_deg'          : aim_deg,
                   'aimdeviation_deg' : aimdeviation_deg,
                   'aimtime_ms'       : aimtime_ms,
-                  'zeroclamped_bool' : not(showcursor_bool),
+                #   'zeroclamped_bool' : not(showcursor_bool),
                 #   'usestrategy_cat'  : usestrategy_cat, # this is not useful in this paradigm
                   'phase'            : phases,       # this used to not be present, but should make data easier to analyze
                   'cutime_ms'        : cutime_ms,
