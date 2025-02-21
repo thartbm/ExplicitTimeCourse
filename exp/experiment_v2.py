@@ -443,15 +443,15 @@ def createTasks(cfg):
     taskcursor = ['regular','nocursor','regular','clamped','regular','nocursor','regular','nocursor','regular']
     taskstrategy = [   'NA',      'NA',     'NA',     'NA',     'NA',      'NA',     'NA',      'NA',     'NA']
 
-    taskinstructions = ['AIM\n&\nmove cursor to target',
-                        'move hand to target',
-                        'AIM\n&\nmove cursor to target',
+    taskinstructions = ['AIM hand\n&\nmove CURSOR to target',
+                        'move HAND to target',
+                        'AIM hand\n&\nmove CURSOR to target',
                         'the cursor is NOT your hand\n\nmove slow\nobserve the difference',
-                        'AIM\n&\nmove cursor to target',
-                        'move hand to target',
-                        'AIM\n&\nmove cursor to target',
-                        'move hand to target',
-                        'AIM\n&\nmove cursor to target']
+                        'AIM hand\n&\nmove CURSOR to target',
+                        'move HAND to target',
+                        'AIM hand\n&\nmove CURSOR to target',
+                        'move HAND to target',
+                        'AIM hand\n&\nmove CURSOR to target']
 
 
 
@@ -473,8 +473,10 @@ def createTasks(cfg):
     taskaiming = taskaiming + [True, True, False]
     # taskinstructions = taskinstructions + ['aim and reach for target',
     #                                         stratinstr]
-    taskinstructions = taskinstructions + ['Reminder:\n\nThe arrow should indicate in which direction you will aim your\n\nHAND movement,\n\nsuch that the CURSOR will go straight to the\ntarget.',
-        '','']
+    taskinstructions = taskinstructions + [
+        'Reminder:\n\nThe arrow should indicate in which direction you will aim your\n\nHAND movement,\n\nsuch that the CURSOR will go straight to the\ntarget.',
+        '',
+        'move HAND to target']
     taskcursor = taskcursor + ['regular','regular','nocursor']
     taskstrategy = taskstrategy + ['NA','NA','NA']
 
