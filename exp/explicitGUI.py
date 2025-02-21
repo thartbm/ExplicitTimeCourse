@@ -5,7 +5,7 @@ import wx
 import wx.adv # advanced GUI widgets
 
 # we need our experiment:
-import experiment
+import experiment_v2
 import familiarization
 
 # we need to open webbrowsers to fill in the consent form:
@@ -136,8 +136,8 @@ class MyFrame(wx.Frame):
 
         # these are the conditions we are running:
         conditions = [  
-                        # 'aiming20',
-                        # 'aiming30',
+                        'aiming20',
+                        'aiming30',
                         'aiming40',
                         'aiming50',
                         'aiming60'  ]
