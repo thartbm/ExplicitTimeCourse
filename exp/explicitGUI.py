@@ -192,11 +192,11 @@ class MyFrame(wx.Frame):
                 summary = pd.read_csv(filename)
                 
                 # calculate baseline:
-                aligned = summary.loc[((summary['task_idx'] == 2) & (summary['trial_idx'] > 16)) | ((summary['task_idx'] == 6) & (summary['trial_idx'] > 8)),]
+                aligned = summary.loc[((summary['task_idx'] == 2) & (summary['trial_idx'] > 16)) | ((summary['task_idx'] == 4) & (summary['trial_idx'] > 4)) | (summary['task_idx'] == 6) | (summary['task_idx'] == 8) | (summary['task_idx'] == 10),]
                 baseline = aligned['reachdeviation_deg'].median()
 
                 # take the last 16 trials of the rotated phase, and apply baseline:
-                rotated = summary.loc[(summary['task_idx']==8) & (summary['trial_idx']>104),]
+                rotated = summary.loc[(summary['task_idx']==12) & (summary['trial_idx']>104),]
                 meandev = rotated['reachdeviation_deg'].median() - baseline
                 
                 # need to know the rotation to decide cutoff and direction of test:
