@@ -268,7 +268,7 @@ def createEnvironment(cfg):
                                     edges=180,
                                     lineWidth=3, 
                                     lineColorSpace='rgb', 
-                                    lineColor='#990000', 
+                                    lineColor='#0000CC', 
                                     fillColorSpace='rgb', 
                                     fillColor=None          )
 
