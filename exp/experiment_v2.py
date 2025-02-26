@@ -443,15 +443,15 @@ def createTasks(cfg):
     taskcursor = ['regular','nocursor','regular','clamped','regular','nocursor','regular','nocursor','regular']
     taskstrategy = [   'NA',      'NA',     'NA',     'NA',     'NA',      'NA',     'NA',      'NA',     'NA']
 
-    taskinstructions = ['AIM hand\n&\nmove CURSOR to target',
-                        'move HAND to target',
-                        'AIM hand\n&\nmove CURSOR to target',
-                        'the cursor is NOT your hand\n\nmove slow\nobserve the difference',
-                        'AIM hand\n&\nmove CURSOR to target',
-                        'move HAND to target',
-                        'AIM hand\n&\nmove CURSOR to target',
-                        'move HAND to target',
-                        'AIM hand\n&\nmove CURSOR to target']
+    taskinstructions = ['HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
+                        'do NOT use your strategy\nmove HAND to target',
+                        'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
+                        'the cursor is NOT your hand\n\nmove slow\nto observe the difference',
+                        'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
+                        'do NOT use your strategy\nmove HAND to target',
+                        'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
+                        'do NOT use your strategy\nmove HAND to target',
+                        'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target']
 
 
 
@@ -476,7 +476,7 @@ def createTasks(cfg):
     taskinstructions = taskinstructions + [
         'Reminder:\n\nThe arrow should indicate in which direction you will aim your\n\nHAND movement,\n\nsuch that the CURSOR will go straight to the\ntarget.',
         '',
-        'move HAND to target']
+        'do NOT use your strategy\nmove HAND to target']
     taskcursor = taskcursor + ['regular','regular','nocursor']
     taskstrategy = taskstrategy + ['NA','NA','NA']
 
