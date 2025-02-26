@@ -426,8 +426,8 @@ def createTasks(cfg):
     taskaiming = [False,True]
     taskcursor = [True,True]
     taskstrategy = ['NA','NA']
-    taskinstructions = ['reach for target',
-                        'aim\n&\nreach for target']
+    taskinstructions = ['move CURSOR to target',
+                        'HAND aim\n\nmove CURSOR to target']
 
 
 
