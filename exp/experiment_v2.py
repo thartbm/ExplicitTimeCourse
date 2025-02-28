@@ -437,7 +437,7 @@ def createTasks(cfg):
     tasktrials = [       24,        16,       16,        8,       8,          8,        8,         8,        8]
     # tasktrials = [8,0,0]
     taskrotation = [      0,         0,        0,   np.NaN,       0,          0,        0,         0,        0]
-    taskaiming = [     True,     False,     True,    False,     True,     False,     True,     False,     True]
+    taskaiming = [     True,     False,     True,     True,     True,     False,     True,     False,     True]
     # taskcursor = [True,False,True,True,True]
 
     taskcursor = ['regular','nocursor','regular','clamped','regular','nocursor','regular','nocursor','regular']
