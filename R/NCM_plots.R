@@ -1,6 +1,41 @@
 
 # plotting functions ----
 
+setupFigureFile <- function(target='inline',width=8,height=6,dpi=300,filename) {
+  
+  if (target == 'pdf') {
+    pdf(file   = filename, 
+        width  = width, 
+        height = height)
+  }
+  if (target == 'svg') {
+    svglite::svglite( filename = filename,
+                      width = width,
+                      height = height,
+                      fix_text_size = FALSE) 
+    # fix_text_size messes up figures on my machine... 
+    # maybe it's better on yours?
+  }
+  if (target == 'png') {
+    png( filename = filename,
+         width = width*dpi,
+         height = height*dpi,
+         res = dpi
+    )
+  }
+  if (target == 'tiff') {
+    tiff( filename = filename,
+          compression = 'lzw',
+          width = width*dpi,
+          height = height*dpi,
+          res = dpi
+    )
+  }
+}
+
+
+
+
 hist2d <- function(x, y=NA, nbins=c(25,25), edges=NA) {
   
   if (is.data.frame(x)) {
@@ -59,11 +94,12 @@ getColorPalette <- function(n=100, bg='#FFFFFF', fg=rgb(229, 22,  54,  255, max 
 
 # D'Amario data -----
 
-plotDAmario_exp4 <- function() {
+plotDAmario_exp4 <- function(add=FALSE) {
   
-  layout(mat=matrix(c(1:3),nrow=3,ncol=1,byrow=TRUE))
-  
-  par(mar=c(4.1,4,1.5,0.1))
+  if (!add) {
+    layout(mat=matrix(c(1:3),nrow=3,ncol=1,byrow=TRUE))
+    par(mar=c(4.1,4,1.5,0.1))
+  }
   
   explicit <- read.csv('data/implicit/exp4/aiming_aiming.csv', stringsAsFactors = F)
   explicit$aimingdeviation_deg <- -1*explicit$aimingdeviation_deg
@@ -85,6 +121,62 @@ plotDAmario_exp4 <- function() {
   names(expl) <- c('x','y')
   names(impl) <- c('x','y')
   names(adpt) <- c('x','y')
+  
+
+  plot(x=1000,y=-1000,
+       main='implicit',xlab='trial',ylab='deviation [°]',
+       xlim=c(13,52),ylim=c(-15,60), 
+       ax=F,bty='n')
+  
+  img_info <- hist2d(x=impl, nbins=NA, edges=list(seq(12.5,52.5,1),seq(-15,60,2.5)))
+  img <- img_info$freq2D
+  
+  img <- log(img + 1)
+  
+  image(x=img_info$x.edges,
+        y=img_info$y.edges,
+        z=img,
+        add=TRUE,
+        col=getColorPalette(fg=rgb(96,   96,  255, 255, max = 255)))
+  
+  lines(x=c(12,20,20,52),
+        y=c(0,0,45,45),
+        col='#999',lty=1,lw=2)
+  
+  avg <- aggregate(y ~ x, data=impl, FUN=mean)
+  lines(avg,
+        col=rgb(229, 22,  54,  255, max = 255),lty=1,lw=2)
+  
+  axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
+  axis(side=2, at=c(0,45))
+  
+  plot(x=1000,y=-1000,
+       main='adaptation',xlab='trial',ylab='deviation [°]',
+       xlim=c(13,52),ylim=c(-15,60), 
+       ax=F,bty='n')
+  
+  img_info <- hist2d(x=adpt, nbins=NA, edges=list(seq(12.5,52.5,1),seq(-15,60,2.5)))
+  img <- img_info$freq2D
+  
+  img <- log(img + 1)
+  
+  image(x=img_info$x.edges,
+        y=img_info$y.edges,
+        z=img,
+        add=TRUE,
+        col=getColorPalette(fg=rgb(127, 0,   216, 255, max = 255)))
+  
+  lines(x=c(12,20,20,52),
+        y=c(0,0,45,45),
+        col='#999',lty=1,lw=2)
+  
+  avg <- aggregate(y ~ x, data=adpt, FUN=mean)
+  lines(avg,
+        col='#000',lty=1,lw=2)
+  
+  axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
+  axis(side=2, at=c(0,45))
+  
   
   plot(x=1000,y=-1000,
        main='explicit',xlab='trial',ylab='deviation [°]',
@@ -114,42 +206,269 @@ plotDAmario_exp4 <- function() {
   axis(side=2, at=c(0,45))
   
   
-  plot(x=1000,y=-1000,
-       main='implicit',xlab='trial',ylab='deviation [°]',
-       xlim=c(13,52),ylim=c(-15,60), 
-       ax=F,bty='n')
   
-  img_info <- hist2d(x=impl, nbins=NA, edges=list(seq(12.5,52.5,1),seq(-15,60,2.5)))
-  img <- img_info$freq2D
+}
+
+stepFunction <- function(par, trials) {
   
-  img <- log(img + 1)
+  if (length(trials) == 1) {
+    trials <- c(0:(trials-1))
+  }
   
-  image(x=img_info$x.edges,
-        y=img_info$y.edges,
-        z=img,
-        add=TRUE,
-        col=getColorPalette())
+  predictions <- rep(0, length(trials))
   
-  lines(x=c(12,20,20,52),
+  predictions[which(trials >= par['t'])] <- par['s']
+  
+  return(predictions)
+  
+}
+
+
+plotStepSizeDistribution <- function(add=FALSE) {
+  
+  df <- read.csv('data/implicit/expStepFits.csv', stringsAsFactors = FALSE)
+  
+  explSteps <- df[which(df$process == 'explicit'),]
+  
+  
+  plot(NULL,NULL,
+       main='fitted step functions',xlab='trial',ylab='deviation [°]',
+       xlim=c(-8,33),ylim=c(-15,60),
+       ax=F,bty='n',)
+  
+  for (participant in explSteps$participant) {
+    
+    par <- c('t'=explSteps$step.t[which(explSteps$participant == participant)],
+             's'=explSteps$step.s[which(explSteps$participant == participant)])
+    
+    trials=c(-8:32)
+    
+    # step function
+    predictions <- stepFunction(par    = par,
+                                trials = trials)
+    
+    lines(x=trials, y=predictions, col='#6666FF33', lw=2)
+    
+  }
+  
+  lines(x=c(-8,0,0,32),
         y=c(0,0,45,45),
-        col='#999',lty=1,lw=2)
+        col='#999',lty=2,lw=2)
   
-  avg <- aggregate(y ~ x, data=impl, FUN=mean)
-  lines(avg,
-        col='#66F',lty=1,lw=2)
   
-  axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
+  stepsizes <- seq(-10,55,1)
+  
+  stepdens <- density(x=explSteps$step.s,
+          bw='nrd0',
+          from=min(stepsizes),
+          to=max(stepsizes),
+          adjust=1,
+          kernel='gaussian',
+          n=length(stepsizes))
+  
+  
+  polygon(x=(c(0,stepdens$y,0)*100)-8,
+          y=c(min(stepsizes),stepsizes, max(stepsizes)),
+          col='#0066FF33',
+          border=NA)
+  lines(x=(stepdens$y*100)-8,
+        y=stepsizes,
+        col='#0066FF', lw=2, lty=2)
+  
+  
+  axis(side=1, at=c(-8,0,8,16,24,32))
   axis(side=2, at=c(0,45))
   
-  plot(x=1000,y=-1000,
-       main='adaptation',xlab='trial',ylab='deviation [°]',
-       xlim=c(13,52),ylim=c(-15,60), 
+}
+
+plotStepTimeDistribution <- function(add=FALSE) {
+  
+  df <- read.csv('data/implicit/expStepFits.csv', stringsAsFactors = FALSE)
+  
+  explSteps <- df[which(df$process == 'explicit'),]
+  
+  # only those with a strategy larger than 5 degrees in the right direction
+  # this excludes 5 / 47 participants (10.6%)
+  explSteps <- explSteps[which(explSteps$step.s > 5),]
+  
+  # plot the distribution of step times
+  stepdistr <- ecdf(round(explSteps$step.t))
+  
+  X <- c(-8,1,knots(stepdistr))
+  Y <- stepdistr(X)
+  
+  plot(NULL,NULL,
+       main='step time distribution',
+       xlab='trial',
+       ylab='probability density',
+       xlim=c(-8,32),ylim=c(0,0.16),
        ax=F,bty='n')
   
-  img_info <- hist2d(x=adpt, nbins=NA, edges=list(seq(12.5,52.5,1),seq(-15,60,2.5)))
+  # plot the empirical distribution
+  # lines(x=X, y=Y, col='#666666', lw=2)
+  
+  empdens <- density(x=explSteps$step.t,
+                  bw=1,
+                  from=-8,
+                  to=32,
+                  adjust=1,
+                  kernel='gaussian',
+                  n=1000)
+  lines(x=empdens$x, y=empdens$y, col='#666666', lw=2)
+  
+  
+  # fit poisson, using ppois (cumulative ppois distribution function)
+  x <- knots(stepdistr)
+  y <- stepdistr(x)
+  x <- x-0
+  # fit the model using optim
+  fit <- optim(par=c(1),
+               fn=MSE.ppois,
+               x=x,
+               y=y,
+               method="L-BFGS-B",
+               lower=c(0),
+               upper=c(60),
+               control=list(maxit=1000))
+  
+  xp <- seq(-8,32,1)
+  yp <- dpois(xp, lambda=fit$par)
+  
+  lines(x=xp, y=yp, col='#FF6600', lw=2, lty=2)
+    
+  # fit gamma using pgamma (cumulative pgamma distribution function)
+  # fit the model using optim
+  fit <- optim(par=c(1,1),
+               fn=MSE.pgamma,
+               x=x,
+               y=y,
+               method="L-BFGS-B",
+               lower=c(0,0),
+               upper=c(60,60),
+               control=list(maxit=1000))
+  
+  xp <- seq(-8,32,0.01)
+  yp <- dgamma(xp, shape=fit$par[1], scale=fit$par[2])
+  
+  # print(fit$par)
+  
+  lines(x=xp, y=yp, col='#0066FF', lw=2, lty=2)
+  
+  legend( x=16,
+          y=0.15,
+          legend=c('empirical','poisson','gamma'),
+          col=c('#666666','#FF6600','#0066FF'),
+          lw=2, lty=c(1,2,2),
+          bty='n')
+  
+  axis(side=1, at=c(-8,0,8,16,24,32))
+  axis(side=2, at=c(0,0.16))
+  
+}
+
+MSE.ppois <- function(par, x, y) {
+  
+  # par is the parameter of the poisson distribution
+  # x is the x-axis of the empirical distribution
+  # y is the y-axis of the empirical distribution
+  
+  # calculate the MSE between the empirical and theoretical distribution
+  mse <- sum((y - ppois(x, lambda=par))^2)
+  
+  return(mse)
+  
+}
+
+MSE.pgamma <- function(par, x, y) {
+  
+  # par is the parameter of the gamma distribution
+  # x is the x-axis of the empirical distribution
+  # y is the y-axis of the empirical distribution
+  
+  # calculate the MSE between the empirical and theoretical distribution
+  mse <- sum((y - pgamma(x, shape=par[1], scale=par[2]))^2)
+  
+  return(mse)
+  
+}
+
+
+plotSimulatedStrategyTimecourse <- function(add=FALSE) {
+  
+  df <- read.csv('data/implicit/expStepFits.csv', stringsAsFactors = FALSE)
+  
+  explSteps <- df[which(df$process == 'explicit'),]
+  
+  sizes <- explSteps$step.s
+  times <- round(explSteps[which(explSteps$step.s > 5),]$step.t)
+  
+  bootstraps <- 400
+  
+  bs.sizes <- sample(sizes, size=bootstraps, replace=TRUE)
+  # bs.times <- sample(times, size=bootstraps, replace=TRUE)
+  
+  # plot(hist(bs.times))
+  
+  # get fitted time distribution:
+  explSteps <- explSteps[which(explSteps$step.s > 5),]
+  
+  # plot the distribution of step times
+  stepdistr <- ecdf(round(explSteps$step.t))
+  X <- c(-8,1,knots(stepdistr))
+  Y <- stepdistr(X)
+  
+  gfit <- optim(par=c(1,1),
+               fn=MSE.pgamma,
+               x=x,
+               y=y,
+               method="L-BFGS-B",
+               lower=c(0,0),
+               upper=c(60,60),
+               control=list(maxit=1000))
+  
+  # xp <- seq(-8,32,0.01)
+  # yp <- dgamma(xp, shape=fit$par[1], scale=fit$par[2])
+  
+  bs.times <- rgamma(bootstraps, shape=gfit$par[1], scale=gfit$par[2])
+  
+  
+  trials <- c(-8:32)
+  
+  timecourses <- NA
+  
+  for (bs in c(1:bootstraps)) {
+    
+    par=c('t'=bs.times[bs], 
+          's'=bs.sizes[bs])
+    
+    rgamma(1, shape=fit$par[1], scale=fit$par[2])
+    
+    # print(par)
+    
+    timecourse <- stepFunction( par=par, 
+                                trials=trials)
+    timecourse <- timecourse + rnorm(length(trials), mean=0, sd=3.5)
+    
+    ndf <- data.frame('x'=trials, 'y'=timecourse)
+    if (is.data.frame(timecourses)) {
+      timecourses <- rbind(timecourses, ndf)
+    } else {
+      timecourses <- ndf
+    }
+    
+  }
+  
+  # print(timecourses)
+  
+  plot(NULL,NULL,
+       main='simulated strategy',xlab='trial',ylab='deviation [°]',
+       xlim=c(-8,32),ylim=c(-15,60),
+       ax=F,bty='n')
+  
+  img_info <- hist2d(x=timecourses, nbins=NA, edges=list(seq(-8.5,32.5,1),seq(-15,60,2.5)))
   img <- img_info$freq2D
   
-  img <- log(img + 1)
+  # img <- log(img + 1)
   
   image(x=img_info$x.edges,
         y=img_info$y.edges,
@@ -157,20 +476,97 @@ plotDAmario_exp4 <- function() {
         add=TRUE,
         col=getColorPalette())
   
-  lines(x=c(12,20,20,52),
+  lines(x=c(-8,0,0,32),
         y=c(0,0,45,45),
         col='#999',lty=1,lw=2)
   
-  avg <- aggregate(y ~ x, data=adpt, FUN=mean)
+  avg <- aggregate(y ~ x, data=timecourses, FUN=mean)
   lines(avg,
         col='#66F',lty=1,lw=2)
   
-  axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
+  axis(side=1, at=c(-8,0,8,16,24,32))
   axis(side=2, at=c(0,45))
   
 }
 
 
+plotImplicitMSE <- function(add=FALSE) {
+  
+  
+  df <- read.csv('data/implicit/expStepFits.csv', stringsAsFactors = FALSE)
+  
+  if (!add) {
+    layout(mat=matrix(c(1:3),nrow=1,ncol=3,byrow=TRUE))
+  }
+  
+  set.seed(1337)
+  
+  exp.colors  <- c('#0066FFFF', '#0066FF33')
+  step.colors <- c('#FF6600FF', '#FF660033')
+  
+  for (process in c('adaptation', 'implicit', 'explicit')) {
+    
+    if (process %in% c('implicit','adaptation')) {
+      YL <- c(0,3200)
+    } else {
+      YL <- c(0,400)
+    }
+    
+    plot(-1000,-1000,main=process,
+         xlab='function',ylab='MSE',
+         xlim=c(0.5,2.5),ylim=YL,
+         bty='n',ax=F)
+    
+    sdf <- df[which(df$process == process),]
+    MSEstep <- sdf$step.MSE
+    MSEexp  <- sdf$exp.MSE
+    
+    # EXPONENTIAL FIT
+    points(x=rep(0.75,length(MSEexp)),
+           y=MSEexp,
+           pch=16, cex=2,
+           col=exp.colors[2])
+    
+    avg <- mean(MSEexp)
+    CI  <- Reach::getConfidenceInterval(MSEexp,method='b')
+    
+    polygon(x=c(1,1.25,1.25,1),
+            y=rep(c(CI[1],CI[2]),each=2),
+            border=NA,
+            col=exp.colors[2])
+    lines(x=c(1,1.25),
+          y=rep(avg,2),
+          col=exp.colors[1])
+    
+    # STEP FUNCTION FIT
+    
+    points(x=rep(1.75,length(MSEstep)),
+           y=MSEstep,
+           pch=16, cex=2,
+           col=step.colors[2])
+    
+    avg <- mean(MSEstep)
+    CI  <- Reach::getConfidenceInterval(MSEstep,method='b')
+    
+    polygon(x=c(2,2.25,2.25,2),
+            y=rep(c(CI[1],CI[2]),each=2),
+            border=NA,
+            col=step.colors[2])
+    lines(x=c(2,2.25),
+          y=rep(avg,2),
+          col=step.colors[1])
+    
+    if (process %in% c('implicit','adaptation')) {
+      axis(side=2,at=seq(0,3200,1600))
+    } else {
+      axis(side=2,at=seq(0,400,200))
+    }
+    
+    axis(side=1, at=c(1,2), labels=c('exp.','step'))
+    
+  }
+  
+}
 
 
 
@@ -248,11 +644,13 @@ getRotationData <- function(rotation) {
 
 
 
-plotNewData <- function() {
+plotNewData <- function(add=FALSE) {
   
   df <- loadNewData()
   
-  layout(mat=matrix(c(1:5),ncol=1,byrow=TRUE))
+  if (!add) {
+    layout(mat=matrix(c(1:5),ncol=1,byrow=TRUE))
+  }
   
   par(mar=c(4.1,4,1.5,0.1))
   
@@ -279,7 +677,7 @@ plotNewData <- function() {
           y=img_info$y.edges,
           z=img,
           add=TRUE,
-          col=getColorPalette())
+          col=getColorPalette(fg=rgb(255, 147, 41,  127, max = 255)))
     
     lines(x=c(0,8,8,40)-9,
           y=c(0,0,rotation,rotation),
@@ -287,7 +685,7 @@ plotNewData <- function() {
     
     avg <- aggregate(y ~ x, data=sdf, FUN=mean)
     lines(avg,
-          col='#66F',lty=1,lw=2)
+          col=rgb(127, 0,   216,  255, max = 255),lty=1,lw=2)
     
     axis(side=1, at=c(0, 8, 16, 24, 32, 40)-9, labels=c(-8,0,8,16,24,32))
     axis(side=2, at=c(0,rotation))
@@ -297,3 +695,50 @@ plotNewData <- function() {
   
 }
 
+unifiedPosterPlot <- function() {
+  
+  setupFigureFile(target='pdf',width=15,height=10,dpi=300,filename='doc/NCM_plots.pdf')
+  
+  layout(mat=matrix(c(16,
+                       1,
+                       2,
+                      15,
+                      15,
+                      
+                       3,
+                       4,
+                       5,
+                       6,
+                       7,
+                      
+                      3,
+                      4,
+                      5,
+                      6,
+                      8,
+
+                      3,
+                      4,
+                      5,
+                      6,
+                      9,
+                      
+                      
+                      10,
+                      11,
+                      12,
+                      13,
+                      14 ),ncol=5,nrow=5,byrow=FALSE),widths = c(3,1,1,1,3))
+  
+  par(mar=c(4.1,4,1.5,0.1))
+  
+  plotDAmario_exp4(add=TRUE)
+  plotStepSizeDistribution(add=TRUE)
+  plotStepTimeDistribution(add=TRUE)
+  plotSimulatedStrategyTimecourse(add=TRUE)
+  plotImplicitMSE(add=TRUE)
+  plotNewData(add=TRUE)
+  
+  dev.off()
+  
+}
