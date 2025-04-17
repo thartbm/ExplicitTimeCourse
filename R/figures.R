@@ -117,6 +117,8 @@ implicitAiming2Dhist <- function() {
   
   layout(mat=matrix(c(1:3),nrow=3,ncol=1,byrow=TRUE))
   
+  par(mar=c(4.1,4,1.5,0.1))
+  
   explicit <- read.csv('data/implicit/exp4/aiming_aiming.csv', stringsAsFactors = F)
   explicit$aimingdeviation_deg <- -1*explicit$aimingdeviation_deg
   implicit <- read.csv('data/implicit/exp4/aiming_nocursors.csv', stringsAsFactors = F)
@@ -139,7 +141,7 @@ implicitAiming2Dhist <- function() {
   names(adpt) <- c('x','y')
   
   plot(x=1000,y=-1000,
-       main='explicit',xlab='',ylab='',
+       main='explicit',xlab='trial',ylab='deviation [°]',
        xlim=c(13,52),ylim=c(-15,60), 
        ax=F,bty='n')
   
@@ -151,18 +153,23 @@ implicitAiming2Dhist <- function() {
   image(x=img_info$x.edges,
         y=img_info$y.edges,
         z=img,
-        add=TRUE)
+        add=TRUE,
+        col=getColorPalette())
   
   lines(x=c(12,20,20,52),
         y=c(0,0,45,45),
+        col='#999',lty=1,lw=2)
+  
+  avg <- aggregate(y ~ x, data=expl, FUN=mean)
+  lines(avg,
         col='#66F',lty=1,lw=2)
   
   axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
-  axis(side=2, at=seq(-15,60,15))
+  axis(side=2, at=c(0,45))
   
   
   plot(x=1000,y=-1000,
-       main='implicit',xlab='',ylab='',
+       main='implicit',xlab='trial',ylab='deviation [°]',
        xlim=c(13,52),ylim=c(-15,60), 
        ax=F,bty='n')
   
@@ -174,17 +181,22 @@ implicitAiming2Dhist <- function() {
   image(x=img_info$x.edges,
         y=img_info$y.edges,
         z=img,
-        add=TRUE)
+        add=TRUE,
+        col=getColorPalette())
   
   lines(x=c(12,20,20,52),
         y=c(0,0,45,45),
+        col='#999',lty=1,lw=2)
+  
+  avg <- aggregate(y ~ x, data=impl, FUN=mean)
+  lines(avg,
         col='#66F',lty=1,lw=2)
   
   axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
-  axis(side=2, at=seq(-15,60,15))
+  axis(side=2, at=c(0,45))
   
   plot(x=1000,y=-1000,
-       main='adaptation',xlab='',ylab='',
+       main='adaptation',xlab='trial',ylab='deviation [°]',
        xlim=c(13,52),ylim=c(-15,60), 
        ax=F,bty='n')
   
@@ -196,14 +208,19 @@ implicitAiming2Dhist <- function() {
   image(x=img_info$x.edges,
         y=img_info$y.edges,
         z=img,
-        add=TRUE)
+        add=TRUE,
+        col=getColorPalette())
   
   lines(x=c(12,20,20,52),
         y=c(0,0,45,45),
+        col='#999',lty=1,lw=2)
+  
+  avg <- aggregate(y ~ x, data=adpt, FUN=mean)
+  lines(avg,
         col='#66F',lty=1,lw=2)
   
   axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
-  axis(side=2, at=seq(-15,60,15))
+  axis(side=2, at=c(0,45))
   
 }
 
@@ -844,4 +861,30 @@ newTimeCoursePlots <- function() {
     
   }
   
+}
+
+
+
+
+
+
+
+
+
+
+# utility functions ----
+
+getColorPalette <- function(n=100, bg='#FFFFFF', fg=rgb(229, 22,  54,  255, max = 255)) {
+
+  # get a color palette with n colors, starting from the background color
+  # and ending with the foreground color
+
+  # bg <- '#FFFFFF'
+  # fg <- rgb(229, 22,  54,  255, max = 255)
+
+  pal <- grDevices::colorRampPalette(c(bg, fg))(n)
+
+  return(pal)
+
+
 }
