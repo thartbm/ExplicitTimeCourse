@@ -275,7 +275,7 @@ def createEnvironment(cfg):
 
     cfg['instruction'] = visual.TextStim(win=cfg['win'], text='', pos=[0,0], colorSpace='rgb', color='#999999', flipVert=True)
 
-    cfg['aimtext'] = visual.TextStim(win=cfg['win'], text="HAND movement aim\n(not cursor)", pos=[0,9.5], colorSpace='rgb', color='#999999', flipVert=True)
+    cfg['aimtext'] = visual.TextStim(win=cfg['win'], text="", pos=[0,5], colorSpace='rgb', color='#999999', flipVert=True)
 
     #arrowvertices = ((-.33,-.33),(6.33,-.33),(6,-1),(8,0),(6,1),(6.33,.33),(-.33,.33))
     arrowvertices = ((-.02,-.02),(0.82,-.02),(0.8,-.08),(1,0),(0.8,.08),(0.82,.02),(-.02,.02))
@@ -453,6 +453,7 @@ def createTasks(cfg):
                         'do NOT use your strategy\nmove HAND to target',
                         'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target']
 
+    aimtexts = [ "", "", "", "", "", "", "", "", "" ]
 
 
     # # TASK THAT INSTRUCTS THE EXPERIMENTER?
@@ -477,13 +478,18 @@ def createTasks(cfg):
         'Reminder:\n\nThe arrow should indicate in which direction you will aim your\n\nHAND movement,\n\nsuch that the CURSOR will go straight to the\ntarget.',
         '',
         'do NOT use your strategy\nmove HAND to target']
+
+    aimtexts = aimtexts + [ "HAND movement aim\n(not cursor)",
+                            "HAND movement aim\n(not cursor)",
+                            "HAND movement aim\n(not cursor)"  ]
+    
     taskcursor = taskcursor + ['regular','regular','nocursor']
     taskstrategy = taskstrategy + ['NA','NA','NA']
 
 
     for taskno in range(len(tasktrials)):
 
-        ttargets, trotation, taiming, taimdev, tcursor, tstrategy = [], [], [], [], [], []
+        ttargets, trotation, taiming, taimdev, taimtext, tcursor, tstrategy = [], [], [], [], [], [], []
 
         for iter in range(int(tasktrials[taskno]/len(targets))):
             random.shuffle(targets)
@@ -497,13 +503,16 @@ def createTasks(cfg):
             taiming = taiming + list(np.repeat(taskaiming[taskno],len(targets)))
             random.shuffle(aimingoffsets)
             taimdev = taimdev + aimingoffsets
+            # taimtext = taimtext + aimtexts[taskno]
             tcursor = tcursor + list(np.repeat(taskcursor[taskno],len(targets)))
             tstrategy = tstrategy + list(np.repeat(taskstrategy[taskno],len(targets)))
+
 
         taskdict = {    'target'      : ttargets,
                         'rotation'    : trotation,
                         'aiming'      : taiming, 
                         'aimoffset'   : taimdev, 
+                        'aimtext'     : aimtexts[taskno],
                         'cursor'      : tcursor,
                         'instruction' : taskinstructions[taskno],
                         'strategy'    : tstrategy}
@@ -526,6 +535,8 @@ def doTasks(cfg):
         cfg = showInstruction(cfg)
 
         task = cfg['tasks'][taskno]
+
+        cfg['aimtext'].text = task['aimtext']
 
         for trialno in list(range(len(task['target']))):
 
