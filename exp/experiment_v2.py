@@ -453,7 +453,7 @@ def createTasks(cfg):
                         'do NOT use your strategy\nmove HAND to target',
                         'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target']
 
-    aimtexts = [ "", "", "", "", "", "", "", "", "" ]
+    aimtexts = [ "nanana", "", "", "", "", "", "", "", "" ]
 
 
     # # TASK THAT INSTRUCTS THE EXPERIMENTER?
@@ -489,7 +489,7 @@ def createTasks(cfg):
 
     for taskno in range(len(tasktrials)):
 
-        ttargets, trotation, taiming, taimdev, taimtext, tcursor, tstrategy = [], [], [], [], [], [], []
+        ttargets, trotation, taiming, taimdev, tcursor, tstrategy = [], [], [], [], [], []
 
         for iter in range(int(tasktrials[taskno]/len(targets))):
             random.shuffle(targets)
@@ -506,19 +506,17 @@ def createTasks(cfg):
             # taimtext = taimtext + aimtexts[taskno]
             tcursor = tcursor + list(np.repeat(taskcursor[taskno],len(targets)))
             tstrategy = tstrategy + list(np.repeat(taskstrategy[taskno],len(targets)))
-
-
+        
         taskdict = {    'target'      : ttargets,
                         'rotation'    : trotation,
                         'aiming'      : taiming, 
                         'aimoffset'   : taimdev, 
-                        'aimtext'     : aimtexts[taskno],
+                        'aimhint'     : aimtexts[taskno],
                         'cursor'      : tcursor,
                         'instruction' : taskinstructions[taskno],
                         'strategy'    : tstrategy}
+
         tasks.append(taskdict)
-
-
 
     cfg['tasks'] = tasks
 
@@ -533,10 +531,8 @@ def doTasks(cfg):
         cfg['taskno'] = taskno
 
         cfg = showInstruction(cfg)
-
+        
         task = cfg['tasks'][taskno]
-
-        cfg['aimtext'].text = task['aimtext']
 
         for trialno in list(range(len(task['target']))):
 
@@ -597,7 +593,8 @@ def doTrial(cfg):
     # phase 0: do pre-reach aiming if required:
     doAim = cfg['tasks'][cfg['taskno']]['aiming'][cfg['trialno']]
     if doAim:
-
+        
+        #print('going to do aiming')
         cfg = doAiming(cfg)
         aim = cfg['aim']
 
@@ -850,6 +847,9 @@ def doTrial(cfg):
 
 def doAiming(cfg):
 
+
+    cfg['aimtext'].setText(text = cfg['tasks'][cfg['taskno']]['aimhint'])
+
     cfg['aim'] = np.NaN
     cfg['aimtime_ms'] = np.NaN
 
@@ -865,6 +865,8 @@ def doAiming(cfg):
     startaiming = time.time()
 
     needleMoved = False
+
+    # print('aiming while loop')
 
     while(not(aimDecided)):
 
