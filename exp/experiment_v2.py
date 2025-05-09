@@ -453,7 +453,7 @@ def createTasks(cfg):
                         'do NOT use your strategy\nmove HAND to target',
                         'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target']
 
-    aimtexts = [ "nanana", "", "", "", "", "", "", "", "" ]
+    aimtexts = [ "", "", "", "", "", "", "", "", "" ]
 
 
     # # TASK THAT INSTRUCTS THE EXPERIMENTER?
