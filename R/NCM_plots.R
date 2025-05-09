@@ -97,7 +97,7 @@ getColorPalette <- function(n=100, bg='#FFFFFF', fg=rgb(229, 22,  54,  255, max 
 plotDAmario_exp4 <- function(add=FALSE) {
   
   if (!add) {
-    layout(mat=matrix(c(1:3),nrow=3,ncol=1,byrow=TRUE))
+    layout(mat=matrix(c(1:6),nrow=3,ncol=2,byrow=TRUE))
     par(mar=c(4.1,4,1.5,0.1))
   }
   
@@ -114,13 +114,65 @@ plotDAmario_exp4 <- function(add=FALSE) {
   impl <- implicit[   which(implicit$trialno   %in% c(13:52)), ]
   adpt <- adaptation[ which(adaptation$trialno %in% c(13:52)), ]
   
-  expl <- expl[,c('trialno','aimingdeviation_deg')]
-  impl <- impl[,c('trialno','reachdeviation_deg')]
-  adpt <- adpt[,c('trialno','reachdeviation_deg')]
+  # EXPLICIT 1 should be (lines)
   
+  plot(x=1000,y=-1000,
+       main='explicit',xlab='trial',ylab='deviation [°]',
+       xlim=c(13,52),ylim=c(-15,60), 
+       ax=F,bty='n')
+  
+  for (ID in unique(expl$participant)) {
+    
+    sdf <- expl[which(expl$participant == ID),]
+    lines(x = expl$trialno[which(expl$participant == ID)],
+          y = expl$aimingdeviation_deg[which(expl$participant == ID)],
+          col = rgb(229, 22,  54,  66, max = 255))
+    
+  }
+
+  lines(x=c(12,20,20,52),
+        y=c(0,0,45,45),
+        col='#999',lty=1,lw=2)
+  
+
+  axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
+  axis(side=2, at=c(0,45))
+  
+  
+  expl <- expl[,c('trialno','aimingdeviation_deg')]
   names(expl) <- c('x','y')
+  
+  # IMPLICIT 1 (should be lines)
+  
+  plot(x=1000,y=-1000,
+       main='implicit',xlab='trial',ylab='deviation [°]',
+       xlim=c(13,52),ylim=c(-15,60), 
+       ax=F,bty='n')
+  
+  for (ID in unique(impl$participant)) {
+    
+    sdf <- impl[which(impl$participant == ID),]
+    lines(x = impl$trialno[which(impl$participant == ID)],
+          y = impl$reachdeviation_deg[which(impl$participant == ID)],
+          col = rgb(96,   96,  255, 66, max = 255))
+    
+  }
+  
+  lines(x=c(12,20,20,52),
+        y=c(0,0,45,45),
+        col='#999',lty=1,lw=2)
+  
+  avg <- aggregate(impl$reachdeviation_deg ~ impl$trialno, data=impl, FUN=mean)
+  lines(avg,
+        col=rgb(229, 22,  54,  255, max = 255),lty=1,lw=2)
+  
+  axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
+  axis(side=2, at=c(0,45))
+  
+  
+  impl <- impl[,c('trialno','reachdeviation_deg')]
   names(impl) <- c('x','y')
-  names(adpt) <- c('x','y')
+  
   
 
   plot(x=1000,y=-1000,
@@ -150,6 +202,37 @@ plotDAmario_exp4 <- function(add=FALSE) {
   axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
   axis(side=2, at=c(0,45))
   
+  # ADAPTATION 1 (should be lines)
+  
+  plot(x=1000,y=-1000,
+       main='adaptation',xlab='trial',ylab='deviation [°]',
+       xlim=c(13,52),ylim=c(-15,60), 
+       ax=F,bty='n')
+  
+  
+  for (ID in unique(adpt$participant)) {
+    
+    sdf <- adpt[which(adpt$participant == ID),]
+    lines(x = adpt$trialno[which(adpt$participant == ID)],
+          y = adpt$reachdeviation_deg[which(adpt$participant == ID)],
+          col = rgb(127, 0,   216,  66, max = 255))
+    
+  }
+  
+  lines(x=c(12,20,20,52),
+        y=c(0,0,45,45),
+        col='#999',lty=1,lw=2)
+  
+  avg <- aggregate(adpt$reachdeviation_deg ~ adpt$trialno, data=adpt, FUN=mean)
+  lines(avg,
+        col='#000',lty=1,lw=2)
+
+  axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
+  axis(side=2, at=c(0,45))
+  
+  adpt <- adpt[,c('trialno','reachdeviation_deg')]
+  names(adpt) <- c('x','y')
+  
   plot(x=1000,y=-1000,
        main='adaptation',xlab='trial',ylab='deviation [°]',
        xlim=c(13,52),ylim=c(-15,60), 
@@ -176,7 +259,6 @@ plotDAmario_exp4 <- function(add=FALSE) {
   
   axis(side=1, at=c(12, 20, 28, 36, 44, 52), labels=c(-8,0,8,16,24,32))
   axis(side=2, at=c(0,45))
-  
   
   plot(x=1000,y=-1000,
        main='explicit',xlab='trial',ylab='deviation [°]',
@@ -402,7 +484,7 @@ plotSimulatedStrategyTimecourse <- function(add=FALSE) {
   sizes <- explSteps$step.s
   times <- round(explSteps[which(explSteps$step.s > 5),]$step.t)
   
-  bootstraps <- 400
+  bootstraps <- 300
   
   bs.sizes <- sample(sizes, size=bootstraps, replace=TRUE)
   # bs.times <- sample(times, size=bootstraps, replace=TRUE)
@@ -419,8 +501,8 @@ plotSimulatedStrategyTimecourse <- function(add=FALSE) {
   
   gfit <- optim(par=c(1,1),
                fn=MSE.pgamma,
-               x=x,
-               y=y,
+               x=X,
+               y=Y,
                method="L-BFGS-B",
                lower=c(0,0),
                upper=c(60,60),
@@ -441,7 +523,7 @@ plotSimulatedStrategyTimecourse <- function(add=FALSE) {
     par=c('t'=bs.times[bs], 
           's'=bs.sizes[bs])
     
-    rgamma(1, shape=fit$par[1], scale=fit$par[2])
+    rgamma(1, shape=gfit$par[1], scale=gfit$par[2])
     
     # print(par)
     
@@ -695,40 +777,49 @@ plotNewData <- function(add=FALSE) {
   
 }
 
+
 unifiedPosterPlot <- function() {
   
-  setupFigureFile(target='pdf',width=15,height=10,dpi=300,filename='doc/NCM_plots.pdf')
+  setupFigureFile(target='pdf',width=20,height=10,dpi=300,filename='doc/NCM_plots.pdf')
   
-  layout(mat=matrix(c(16,
+  layout(mat=matrix(c(18,
+                      18,
                        1,
                        2,
-                      15,
-                      15,
-                      
-                       3,
                        4,
+                      
+                      18,
+                      18,
+                      19,
+                       3,
                        5,
+                      
                        6,
                        7,
-                      
-                      3,
-                      4,
-                      5,
-                      6,
-                      8,
+                       8,
+                       9,
+                       10,
 
-                      3,
-                      4,
-                      5,
                       6,
+                      7,
+                      8,
                       9,
-                      
-                      
-                      10,
                       11,
+
+                      6,
+                      7,
+                      8,
+                      9,
                       12,
+
                       13,
-                      14 ),ncol=5,nrow=5,byrow=FALSE),widths = c(3,1,1,1,3))
+                      14,
+                      15,
+                      16,
+                      17 ),ncol=6,nrow=5,byrow=FALSE),
+         
+         widths = c(3,3,1,1,1,3),
+         height = c(2,2,2,2,2))
   
   par(mar=c(4.1,4,1.5,0.1))
   
@@ -740,5 +831,22 @@ unifiedPosterPlot <- function() {
   plotNewData(add=TRUE)
   
   dev.off()
+  
+}
+
+
+makeQRcode <- function() {
+  
+  URL <- "https://mariusthart.net/NCM_2025_tHart_v3.pdf"
+  
+  qrcode::generate_svg( qrcode = qrcode::qr_code(URL),
+                        filename = "doc/NCM_qrcode.svg",
+                        width = 200,
+                        height = 200,
+                        background = "#FFFFFF",
+                        foreground = "#000000",
+                        quiet = 0,
+                        error_correction = "L")
+  
   
 }
